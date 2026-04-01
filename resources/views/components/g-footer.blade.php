@@ -53,6 +53,15 @@
         <div class="support-modal-body">
             <p class="text-muted mb-4">How would you like to chat with us?</p>
             <div class="support-options">
+                <a href="t.me/boosterhq" target="_blank" class="support-option">
+                    <div class="support-option-icon whatsapp">
+                        <i class="feather-message-square"></i>
+                    </div>
+                    <div class="support-option-content">
+                        <h6>Telegram (Recommended) </h6>
+                        <p>Chat with us on Telegram </p>
+                    </div>
+                </a>
                 <a href="#" class="support-option" id="websiteSupport">
                     <div class="support-option-icon">
                         <i class="feather-message-circle"></i>
@@ -60,15 +69,6 @@
                     <div class="support-option-content">
                         <h6>Website Chat</h6>
                         <p>Chat with us on our website</p>
-                    </div>
-                </a>
-                <a href="https://wa.me/2348152880128" target="_blank" class="support-option">
-                    <div class="support-option-icon whatsapp">
-                        <i class="feather-message-square"></i>
-                    </div>
-                    <div class="support-option-content">
-                        <h6>WhatsApp</h6>
-                        <p>Chat with us on WhatsApp</p>
                     </div>
                 </a>
             </div>

@@ -216,6 +216,30 @@
                 </div>
 
                 @if(!auth('admin')->user()->isSupport())
+                @if(auth('admin')->user()->canEditOrders())
+                <div class="col-xxl-3 col-md-6">
+                    <div class="card stretch stretch-full">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start justify-content-between mb-4">
+                                <div class="d-flex gap-4 align-items-center">
+                                    <div class="avatar-text avatar-lg bg-info-subtle">
+                                        <i class="feather-server text-info"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fs-4 fw-bold text-dark">
+                                            {{ $ogaviralBalance !== null ? '₦' . number_format($ogaviralBalance, 2) : 'Unavailable' }}
+                                        </div>
+                                        <h3 class="fs-13 fw-semibold text-truncate-1-line">Ogaviral API Balance</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-4 border-top">
+                                <span class="fs-12 fw-medium text-muted">Provider account balance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
                 <!-- REVENUE STATISTICS -->
                 <div class="col-xxl-4 col-md-6">
                     <div class="card stretch stretch-full">

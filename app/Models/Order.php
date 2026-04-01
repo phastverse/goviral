@@ -21,7 +21,8 @@ class Order extends Model
         'markup_percentage',
         'status', 
         'api_order_id', 
-        'api_response'
+        'api_response',
+        'reseller_id'
     ];
 
     public function user()

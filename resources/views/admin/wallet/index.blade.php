@@ -153,6 +153,10 @@
 
                                             <option value="korapay" {{ request('payment_method') == 'korapay' ? 'selected' : '' }}>Korapay</option>
                                             <option value="order debit" {{ request('payment_method') == 'order debit' ? 'selected' : '' }}>Order Debit</option>
+                                            <option value="panel order (user)" {{ request('payment_method') == 'panel order (user)' ? 'selected' : '' }}>Panel Order (User)</option>
+                                            <option value="Reseller Customer Payment" {{ request('payment_method') == 'Reseller Customer Payment' ? 'selected' : '' }}>Reseller Customer Payment</option>
+                                            <option value="Booster Cost For Customer Order (Panel)" {{ request('payment_method') == 'Booster Cost For Customer Order (Panel)' ? 'selected' : '' }}>Booster Cost For Customer Order (Panel)</option>
+                                            <option value="api order debit" {{ request('payment_method') == 'api order debit' ? 'selected' : '' }}>Api Order Debit</option>
                                              <option value="fincra" {{ request('payment_method') == 'fincra' ? 'selected' : '' }}>Fincra</option>
                                              
                                             <option value="paystack" {{ request('payment_method') == 'paystack' ? 'selected' : '' }}>Paystack</option>

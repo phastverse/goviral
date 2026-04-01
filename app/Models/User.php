@@ -77,4 +77,24 @@ class User extends Authenticatable
         return $this->hasOne(ReferredUser::class, 'referred_user_id');
     }
 
+    public function apiKeys()
+    {
+        return $this->hasMany(ApiKey::class);
+    }
+
+    public function resellerProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Reseller::class);
+    }
+
+    public function resellerMembership(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\ResellerUser::class);
+    }
+
+    public function belongsToReseller(): ?\App\Models\Reseller
+    {
+        return $this->resellerMembership?->reseller;
+    }
+
 }

@@ -15,10 +15,10 @@ class KorapayService
 
     public function __construct()
     {
-        $this->baseUrl = rtrim(env('KORAPAY_BASE_URL', 'https://api.korapay.com/merchant'), '/');
-        $this->secretKey = trim(env('KORAPAY_SECRET_KEY'));
-        $this->publicKey = trim(env('KORAPAY_PUBLIC_KEY'));
-        $this->currency = env('KORAPAY_CURRENCY', 'NGN');
+        $this->baseUrl = rtrim(config('services.korapay.base_url', 'https://api.korapay.com/merchant'), '/');
+        $this->secretKey = trim(config('services.korapay.secret_key'));
+        $this->publicKey = trim(config('services.korapay.public_key'));
+        $this->currency = config('services.korapay.currency', 'NGN');
     }
 
     public function initializeTransaction($amount, $user, $redirectUrl)

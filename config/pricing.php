@@ -20,7 +20,7 @@ return [
     | Competitive markups based on typical SMM panel margins
     | Priority 3 (checked after combined and platform markups)
     |
-    */
+    */ 
     'service_type_markup' => [
         'followers' => 40,      // 35% - High demand, good margins
         'likes' => 40,          // 25% - Very common, keep competitive

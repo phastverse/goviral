@@ -9,7 +9,8 @@ use App\Http\Controllers\Admin\WalletController;
 use App\Http\Controllers\Admin\SupportController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProfileController;
-
+use App\Http\Controllers\Admin\PricingConfigController;
+use App\Http\Controllers\Admin\AdminResellerController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -55,6 +56,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{id}/reject', [WalletController::class, 'reject'])->name('reject');
             Route::delete('/{id}', [WalletController::class, 'destroy'])->name('destroy');
         });
+
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/pricing', [PricingConfigController::class, 'index'])->name('pricing.index');
+            Route::post('/pricing', [PricingConfigController::class, 'update'])->name('pricing.update');
+        });
+
         
         Route::prefix('support')->name('support.')->group(function () {
             Route::get('/', [SupportController::class, 'index'])->name('index');
@@ -100,6 +107,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{id}/reject', [App\Http\Controllers\Admin\ReferralWithdrawalController::class, 'reject'])->name('reject');
         });
     });
+
+
+        Route::prefix('resellers')->name('resellers.')->group(function () {
+            Route::get('/',                     [AdminResellerController::class, 'index'])->name('index');
+            Route::get('/create',               [AdminResellerController::class, 'create'])->name('create');
+            Route::post('/',                    [AdminResellerController::class, 'store'])->name('store');
+            Route::get('/{reseller}',           [AdminResellerController::class, 'show'])->name('show');
+            Route::patch('/{reseller}/status',  [AdminResellerController::class, 'updateStatus'])->name('status'); 
+            Route::patch('/{reseller}/approve', [AdminResellerController::class, 'approve'])->name('approve');
+            Route::patch('/{reseller}/reject',  [AdminResellerController::class, 'reject'])->name('reject');
+            Route::get('/{reseller}/customers', [AdminResellerController::class, 'customers'])->name('customers');
+            Route::get('/{reseller}/orders',    [AdminResellerController::class, 'orders'])->name('orders');
+            Route::get('/{reseller}/wallet',    [AdminResellerController::class, 'wallet'])->name('wallet');
+        });
         
     });
 });

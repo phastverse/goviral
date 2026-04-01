@@ -17,14 +17,50 @@ class DashboardController extends Controller
         $this->ogaviralService = $ogaviralService;
     }
 
-    public function index()
-    {
-        $user = auth()->user();
+public function index()
+{
+    $user = auth()->user();
+    
+    // CHECK PENDING DEPOSITS (batch of 5 for this user only)
+    $this->checkUserPendingDeposits($user, 5);
+    
+    // Check if user is a reseller owner
+    $reseller = \App\Models\Reseller::where('user_id', $user->id)
+        ->where('status', 'active')
+        ->first();
+    
+    $isResellerOwner = ($reseller !== null);
+    
+    if ($isResellerOwner) {
+        // Get all user IDs under this reseller (customers)
+        $customerIds = \App\Models\ResellerUser::where('reseller_id', $reseller->id)
+            ->pluck('user_id')
+            ->toArray();
         
-        // CHECK PENDING DEPOSITS (batch of 5 for this user only)
-        $this->checkUserPendingDeposits($user, 5);
+        // Add the reseller owner's own ID
+        $customerIds[] = $user->id;
         
-        // Recent Orders (Last 5) - Get before stats
+        // Recent Orders - from all customers under this reseller
+        $recentOrders = \App\Models\Order::whereIn('user_id', $customerIds)
+            ->latest()
+            ->limit(5)
+            ->get();
+        
+        // Auto-update recent orders status
+        $this->autoUpdateOrderStatuses($recentOrders);
+        
+        // 1. Wallet Balance (owner's personal balance)
+        $balance = $user->balance;
+        
+        // 2. Order Statistics (from all customers under this reseller)
+        $totalOrders = \App\Models\Order::whereIn('user_id', $customerIds)->count();
+        $completedOrders = \App\Models\Order::whereIn('user_id', $customerIds)->where('status', 'completed')->count();
+        $processingOrders = \App\Models\Order::whereIn('user_id', $customerIds)->where('status', 'processing')->count();
+        $pendingOrders = \App\Models\Order::whereIn('user_id', $customerIds)->where('status', 'pending')->count();
+        $totalSpent = \App\Models\Order::whereIn('user_id', $customerIds)->sum('charge');
+        
+    } else {
+        // Regular user - only their own orders
         $recentOrders = $user->orders()->latest()->limit(5)->get();
         
         // Auto-update recent orders status
@@ -39,18 +75,19 @@ class DashboardController extends Controller
         $processingOrders = $user->orders()->where('status', 'processing')->count();
         $pendingOrders = $user->orders()->where('status', 'pending')->count();
         $totalSpent = $user->orders()->sum('charge');
-        
-        return view('dashboard', compact(
-            'balance', 
-            'totalOrders', 
-            'completedOrders', 
-            'processingOrders',
-            'pendingOrders',
-            'totalSpent', 
-            'recentOrders'
-        ));
     }
-
+    
+    return view('dashboard', compact(
+        'balance', 
+        'totalOrders', 
+        'completedOrders', 
+        'processingOrders',
+        'pendingOrders',
+        'totalSpent', 
+        'recentOrders',
+        'isResellerOwner'
+    ));
+}
     /**
      * Automatically check and update statuses for pending/processing orders
      * WITH AUTO-REFUND SUPPORT

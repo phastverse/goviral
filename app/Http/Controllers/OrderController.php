@@ -459,10 +459,29 @@ class OrderController extends Controller
         }
     }
 
-    // Order History - WITH AUTO STATUS UPDATE
+    /// Order History - WITH AUTO STATUS UPDATE
     public function index(Request $request)
     {
-        $query = Auth::user()->orders()->latest();
+        $user = Auth::user();
+        
+        // Check if user is a reseller owner
+        $reseller = \App\Models\Reseller::where('user_id', $user->id)->first();
+        
+        if ($reseller && $reseller->status === 'active') {
+            // Get all user IDs under this reseller (customers)
+            $customerIds = \App\Models\ResellerUser::where('reseller_id', $reseller->id)
+                ->pluck('user_id')
+                ->toArray();
+            
+            // Add the reseller owner's own ID
+            $customerIds[] = $user->id;
+            
+            // Show orders from all customers under this reseller + owner's own orders
+            $query = \App\Models\Order::whereIn('user_id', $customerIds)->latest();
+        } else {
+            // Regular user - show only their orders
+            $query = $user->orders()->latest();
+        }
         
         // Apply status filter
         if ($request->filled('status')) {
@@ -476,7 +495,6 @@ class OrderController extends Controller
         
         return view('order.index', compact('orders'));
     }
-
     /**
      * Automatically check and update statuses for pending/processing orders
      * WITH AUTO-REFUND SUPPORT
@@ -618,93 +636,51 @@ class OrderController extends Controller
         }
     }
 
-    // Check Order Status (Manual)
-    public function checkStatus($orderId)
-    {
-        $order = Auth::user()->orders()->findOrFail($orderId);
+public function checkStatus($orderId)
+{
+    $order = Auth::user()->orders()->find($orderId);
+    
+    if (!$order) {
+        return redirect()->back()->with('alert', [
+            'type' => 'error',
+            'message' => 'Order not found.'
+        ]);
+    }
 
-        if (!$order->api_order_id) {
-            return redirect()->back()->with('alert', [
-                'type' => 'error',
-                'message' => 'No API order ID found for this order.'
-            ]);
-        }
+    if (!$order->api_order_id) {
+        return redirect()->back()->with('alert', [
+            'type' => 'error',
+            'message' => 'No API order ID found for this order.'
+        ]);
+    }
 
-        // Log status check initiation
-        $this->logOrderAction(
-            'status_check',
-            'STATUS-' . $order->id,
-            0,
-            'success',
-            'Order status check initiated',
-            ['order_id' => $order->id, 'api_order_id' => $order->api_order_id],
-            null
-        );
-
+    try {
         $status = $this->ogaviralService->getOrderStatus($order->api_order_id);
 
         if (isset($status['status'])) {
-            $oldStatus = $order->status;
-            
-            // Map API status to our database status
-            $apiStatus = $status['status'];
-            $newStatus = $this->mapApiStatus($apiStatus);
-            
-            // Check if order should be auto-refunded
-            if ($this->shouldAutoRefund($oldStatus, $newStatus)) {
-                $this->processAutoRefund($order, $oldStatus, $newStatus);
-                
-                return redirect()->back()->with('alert', [
-                    'type' => 'success',
-                    'message' => 'Order has been cancelled by the provider and ₦' . number_format($order->charge, 2) . ' has been refunded to your wallet.'
-                ]);
-            }
-            
-            // Update local order status
             $order->update([
-                'status' => $newStatus,
+                'status' => $status['status'],
                 'api_response' => json_encode($status),
             ]);
 
-            // Log successful status check
-            $this->logOrderAction(
-                'status_updated',
-                'STATUS-' . $order->id,
-                0,
-                'success',
-                'Order status updated successfully',
-                [
-                    'order_id' => $order->id, 
-                    'old_status' => $oldStatus,
-                    'new_status' => $status['status']
-                ],
-                $status
-            );
-
             return redirect()->back()->with('alert', [
                 'type' => 'success',
-                'message' => 'Order status updated: ' . $status['status']
+                'message' => 'Order status updated: ' . ucfirst($status['status'])
             ]);
         }
-
-        // Log failed status check
-        $this->logOrderAction(
-            'status_check_failed',
-            'STATUS-' . $order->id,
-            0,
-            'failed',
-            'Failed to fetch order status',
-            ['order_id' => $order->id, 'api_order_id' => $order->api_order_id],
-            $status,
-            'Status not found in response'
-        );
 
         return redirect()->back()->with('alert', [
             'type' => 'error',
             'message' => 'Failed to fetch order status.'
         ]);
+        
+    } catch (\Exception $e) {
+        return redirect()->back()->with('alert', [
+            'type' => 'error',
+            'message' => 'Error checking order status.'
+        ]);
     }
-
+}
     // Request Refill
     public function requestRefill($orderId)
     {

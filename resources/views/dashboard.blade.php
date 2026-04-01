@@ -267,7 +267,7 @@
         </div>
     </main>
 
-    <!-- WhatsApp Community Modal -->
+    <!-- Community Modal -->
     <div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -276,9 +276,9 @@
                 </div>
                 <div class="modal-body text-center px-4 pb-4">
                     <div class="mb-4">
-                        <i class="feather-message-circle" style="font-size: 3rem; color: #25D366;"></i>
+                        <i class="feather-message-circle" style="font-size: 3rem; color: blue;"></i>
                     </div>
-                    <h4 class="mb-3">Join Our WhatsApp Community!</h4>
+                    <h4 class="mb-3">Join Our Community!</h4>
                     <p class="text-muted mb-4">
                         Stay updated with the latest offers, tips, and announcements.
                     </p>
@@ -286,8 +286,10 @@
                         <a href="https://whatsapp.com/channel/0029Vb7I1e3JuyAL31rIia0r" target="_blank" class="btn btn-success">
                             <i class="feather-users me-2"></i> Join WhatsApp Channel
                         </a>
-                        <a href="https://chat.whatsapp.com/JTFS32A4X8kBUk1V28qmxg" target="_blank" class="btn btn-outline-success">
-                            <i class="feather-message-square me-2"></i> Join WhatsApp Community
+                        <a href="https://t.me/+ZA-kt075CUpkNTg0" target="_blank" class="btn" style="background-color: #229ED9; color: white;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" class="me-2" style="margin-bottom: 2px;">
+                                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                            </svg> Join Telegram Channel
                         </a>
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                             Maybe Later

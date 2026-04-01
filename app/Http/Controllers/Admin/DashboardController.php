@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Traits\ChecksPendingDeposits;
+use App\Services\OgaviralService;
 
 class DashboardController extends Controller
 {
@@ -165,7 +166,16 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // OGAVIRAL API BALANCE
+        $ogaviralBalance = null;
+        if (auth('admin')->user()->canEditOrders()) {
+            $ogaviralService = new OgaviralService();
+            $balanceResponse = $ogaviralService->getBalance();
+            $ogaviralBalance = $balanceResponse['balance'] ?? null;
+        }
+
         return view('admin.dashboard', compact(
+            'ogaviralBalance',
             'period',
             'totalCustomers', 'newCustomers',
             'customersToday', 'customersWeek', 'customersMonth', 'customersYear',
@@ -181,7 +191,7 @@ class DashboardController extends Controller
             'recentOrders', 'recentCustomers', 'recentTransactions'
         ));
     }
-
+ 
     /**
      * Get date range based on period
      */

@@ -49,6 +49,44 @@
                     </ul>
                 </li>
 
+                <!--Api-->
+                <li class="nxl-item">
+                    <a href="{{ route('api.index') }}" class="nxl-link {{ request()->routeIs('api.*') ? 'active' : '' }}">
+                        <span class="nxl-micon"><i class="feather-code"></i></span>
+                        <span class="nxl-mtext">API Access</span>
+                    </a>
+                </li>
+
+                <!-- Reseller Panel -->
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-globe"></i></span>
+                        <span class="nxl-mtext">Reseller Panel</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ route('reseller-panel.index') }}">My Panel</a>
+                        </li>
+                        @php $hasPanel = \App\Models\Reseller::where('user_id', auth()->id())->exists(); @endphp
+                        @if(!$hasPanel)
+                            <li class="nxl-item">
+                                <a class="nxl-link" href="{{ route('reseller-panel.create') }}">Create Panel</a>
+                            </li>
+                        @endif
+
+                        {{-- Reseller Services Link --}}
+                        @if(auth()->check() && \App\Models\Reseller::where('user_id', auth()->id())->where('status', 'active')->exists())
+                        <li class="nxl-item">
+                            <a href="{{ route('reseller-panel.services') }}" class="nxl-link {{ request()->routeIs('reseller-panel.services*') ? 'active' : '' }}">
+                                <span class="nxl-micon"><i class="feather-tag"></i></span>
+                                <span class="nxl-mtext">Service Pricing</span>
+                            </a>
+                        </li>
+                        @endif
+                    </ul>
+                </li>
+
                 <!-- Referer Menu -->
                 <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0);" class="nxl-link">

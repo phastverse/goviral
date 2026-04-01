@@ -47,6 +47,24 @@
                     </a>
                 </li>
 
+                {{-- Reseller Panels --}}
+                <li class="nxl-item">
+                    <a href="{{ route('admin.resellers.index') }}"
+                       class="nxl-link {{ request()->routeIs('admin.resellers.*') ? 'active' : '' }}">
+                        <span class="nxl-micon"><i class="feather-layers"></i></span>
+                        <span class="nxl-mtext">Reseller Panels</span>
+                    </a>
+                </li>
+                <!--Pricing-->
+                @if(auth('admin')->user()->isSuperAdmin())
+                    <li class="nxl-item">
+                        <a href="{{ route('admin.settings.pricing.index') }}" class="nxl-link {{ request()->routeIs('admin.settings.pricing.*') ? 'active' : '' }}">
+                            <span class="nxl-micon"><i class="feather-percent"></i></span>
+                            <span class="nxl-mtext">Pricing Config</span>
+                        </a>
+                    </li>
+                @endif
+
                 <!-- Refreral -->
                 @if(auth('admin')->user()->canManageReferral())
                 <li class="nxl-item">

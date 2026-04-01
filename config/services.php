@@ -45,4 +45,15 @@ return [
         'api_key' => env('OGAVIRAL_API_KEY'),
     ],
 
+    'brevo' => [
+        'key' => env('BREVO_KEY'),
+    ],
+
+    'korapay' => [
+        'secret_key' => env('KORAPAY_SECRET_KEY'),
+        'public_key' => env('KORAPAY_PUBLIC_KEY'),
+        'base_url' => env('KORAPAY_BASE_URL', 'https://api.korapay.com/merchant'),
+        'currency' => env('KORAPAY_CURRENCY', 'NGN'),
+    ],
+
 ];

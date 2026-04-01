@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('quantity'); 
             $table->decimal('charge', 12, 2); 
             $table->decimal('profit', 12, 2)->nullable(); 
-            $table->string('markup_percentage')->nullable()
+            $table->string('markup_percentage')->nullable();
             
             // Status
             $table->enum('status', ['pending', 'processing', 'completed', 'cancelled', 'refunded', 'partial'])->default('pending');

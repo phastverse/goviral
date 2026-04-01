@@ -14,6 +14,10 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    
+    'base_domain' => env('APP_BASE_DOMAIN', 'lvh.me'),
+
+    'server_ip' => env('SERVER_IP', null),
 
     /*
     |--------------------------------------------------------------------------

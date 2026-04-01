@@ -7,7 +7,18 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController; 
 use App\Http\Controllers\SupportController; 
 use App\Http\Controllers\ReferralController; 
+use App\Http\Controllers\ApiKeyController; 
+use App\Http\Controllers\ResellerPanelController;
+use App\Http\Controllers\ResellerServiceController;
+use App\Http\Controllers\Reseller;
 
+// RESELLER SUBDOMAIN ROUTES - Must come first
+// Route::domain('{subdomain}.' . config('app.base_domain', 'lvh.me'))->group(function () {
+//     // Load all reseller routes
+//     require base_path('routes/reseller.php');
+// });
+
+Route::domain(config('app.base_domain', 'boosterr.xyz'))->group(function () {
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +36,9 @@ Route::get('/terms-of-use', function () {
 Route::get('/faq', function () {
     return view('legal.faq');
 })->name('faq');
+
+Route::get('/api/docs', fn() => view('api.docs'))->name('api.docs');
+Route::get('/api/test', fn() => view('api.test-api'))->name('api.test');
 
 // Korapay Webhook
 Route::post('/webhook/korapay', [App\Http\Controllers\KorapayWebhookController::class, 'handleWebhook'])
@@ -80,6 +94,27 @@ Route::middleware('auth')->group(function () {
         }
         return redirect()->back();
     })->name('notifications.mark.read');
+
+        // Reseller Panel Management (user creates/manages their own panel)
+    Route::prefix('reseller-panel')->name('reseller-panel.')->group(function () {
+        Route::get('/',        [ResellerPanelController::class, 'index'])->name('index');
+        Route::get('/create',  [ResellerPanelController::class, 'create'])->name('create');
+         Route::get('/services', [ResellerServiceController::class, 'services'])->name('services');
+        Route::post('/services', [ResellerServiceController::class, 'updateServiceMarkup'])->name('services.update');
+        Route::post('/create', [ResellerPanelController::class, 'store'])->name('store');
+        Route::post('/update', [ResellerPanelController::class, 'update'])->name('update');
+        Route::put('/reseller-panel/domain', [ResellerPanelController::class, 'updateDomain'])->name('update-domain');
+        Route::get('/reseller-panel/verify-domain', [ResellerPanelController::class, 'verifyDomain'])->name('verify-domain');
+    });
+
+    Route::get('/api-access', [ApiKeyController::class, 'index'])->name('api.index');
+    Route::post('/api-access/generate', [ApiKeyController::class, 'generate'])->name('api.generate');
+    Route::post('/api-access/{apiKey}/toggle', [ApiKeyController::class, 'toggle'])->name('api.toggle');
+    Route::delete('/api-access/{apiKey}', [ApiKeyController::class, 'destroy'])->name('api.destroy');
+
 });
 
+
 require __DIR__.'/auth.php';
+
+});
