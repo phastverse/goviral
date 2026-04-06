@@ -68,7 +68,7 @@
                             <div class="alert alert-success mb-0 small">
                                 <i class="feather-check-circle me-2"></i>
                                 <strong>While waiting for approval:</strong> Your panel will be available at:<br>
-                                <code>{{ $subdomainPreview ?? 'yourpanel' }}.{{ config('app.base_domain', 'boosterr.xyz') }}</code>
+                                <code>{{ $subdomainPreview ?? 'yourpanel' }}.{{ config('app.base_domain', 'virextra.com') }}</code>
                             </div>
                         </div>
                     </div>
@@ -106,13 +106,13 @@
                                                placeholder="yourpanel"
                                                value="{{ old('subdomain') }}"
                                                oninput="updatePreview(this.value)" />
-                                        <span class="input-group-text fw-semibold text-muted">.{{ config('app.base_domain', 'boosterr.xyz') }}</span>
+                                        <span class="input-group-text fw-semibold text-muted">.{{ config('app.base_domain', 'virextra.com') }}</span>
                                         @error('subdomain')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     <div class="form-text">
-                                        Your panel URL: <span id="subdomain-preview" class="fw-semibold text-primary">yourpanel.{{ config('app.base_domain', 'boosterr.xyz') }}</span>
+                                        Your panel URL: <span id="subdomain-preview" class="fw-semibold text-primary">yourpanel.{{ config('app.base_domain', 'virextra.com') }}</span>
                                     </div>
                                 </div>
 
@@ -198,7 +198,7 @@
 <script>
     function updatePreview(val) {
         const clean = val.toLowerCase().replace(/[^a-z0-9-_]/g, '');
-        const preview = (clean || 'yourpanel') + '.{{ config('app.base_domain', 'boosterr.xyz') }}';
+        const preview = (clean || 'yourpanel') + '.{{ config('app.base_domain', 'virextra.com') }}';
         document.getElementById('subdomain-preview').textContent = preview;
         
         // Also update the note about pending URL

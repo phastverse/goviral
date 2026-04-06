@@ -77,7 +77,7 @@ class PricingConfigController extends Controller
 
         Artisan::call('config:clear');
 
-        return redirect()->route('admin.pricing.index')
+        return redirect()->back()
             ->with('success', 'Pricing configuration updated successfully!');
     }
 

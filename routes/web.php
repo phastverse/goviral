@@ -18,7 +18,7 @@ use App\Http\Controllers\Reseller;
 //     require base_path('routes/reseller.php');
 // });
 
-Route::domain(config('app.base_domain', 'boosterr.xyz'))->group(function () {
+Route::domain(str_replace(':8000', '', request()->getHost()))->group(function () {
 
 Route::get('/', function () {
     return view('welcome');

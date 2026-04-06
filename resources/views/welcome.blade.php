@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booster — Premium Social Media Growth</title>
-    <meta name="description" content="Boost your social media presence with Booster. We offer premium, fast, and reliable social media growth services for Instagram, Facebook, TikTok, Twitter, and more." />
+    <title>Virextra — Premium Social Media Growth</title>
+    <meta name="description" content="Boost your social media presence with Virextra. We offer premium, fast, and reliable social media growth services for Instagram, Facebook, TikTok, Twitter, and more." />
     <meta name="keyword" content="social media growth, buy followers Nigeria, Instagram growth services, TikTok followers, Facebook likes, Twitter engagement, social media marketing Nigeria" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -938,7 +938,13 @@
             .platforms-grid { grid-template-columns: repeat(3, 1fr); }
             .footer-top { grid-template-columns: 1fr; }
         }
-    </style>
+        @media (max-width: 600px) {
+            /* Stack header text left on mobile */
+            .reseller-hdr-p { text-align: left !important; max-width: 100% !important; }
+            /* Section padding */
+            .reseller-section { padding: 4rem 1.2rem !important; }
+        }
+        </style>
 </head>
 <body>
 
@@ -946,7 +952,7 @@
     <div class="cursor-ring" id="cursorRing"></div>
 
     <nav id="nav">
-        <a href="#" class="logo">Boo<span>ster</span></a>
+        <a href="#" class="logo">Vir<span>extra</span></a>
         <ul class="nav-links">
             <li><a href="#features">Features</a></li>
             <li><a href="#platforms">Platforms</a></li>
@@ -1135,27 +1141,23 @@
         </div>
     </section>
 
-    <!-- RESELLER / API SECTION -->
+<!-- RESELLER / API SECTION -->
 <section style="padding: 6rem 3rem; background: var(--navy); position: relative; overflow: hidden;">
     
-    <!-- Background glow -->
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(37,99,235,0.15) 0%,transparent 70%);pointer-events:none;"></div>
-    
-    <!-- Dot grid -->
     <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;"></div>
 
     <div style="max-width:1400px;margin:0 auto;position:relative;z-index:1;">
 
-        <!-- Header -->
         <div style="margin-bottom:4rem;">
             <div class="section-tag reveal" style="color:#60A5FA;">
                 <span style="background:#60A5FA;"></span>
                 For Resellers & Developers
             </div>
             <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:2rem;">
-                <h2 class="reveal" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,6vw,5.5rem);line-height:1;color:#fff;">
+                <h2 class="reveal" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,6vw,5.5rem);line-height:1;color:#fff;">
                     Build On<br>
-                    <span style="-webkit-text-stroke:1px rgba(255,255,255,0.2);color:transparent;">Booster</span>
+                    <span style="-webkit-text-stroke:1px rgba(255,255,255,0.2);color:transparent;">Virextra</span>
                 </h2>
                 <p class="reveal" style="color:#94A3B8;font-size:0.95rem;max-width:380px;line-height:1.7;text-align:right;">
                     White-label our platform or connect your own panel via API. 
@@ -1164,11 +1166,11 @@
             </div>
         </div>
 
-        <!-- Two Cards -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;">
+        <!-- Cards grid -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 400px), 1fr));gap:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;">
             
             <!-- Reseller Card -->
-            <div class="reveal" style="background:#0F172A;padding:3rem;position:relative;overflow:hidden;transition:background 0.3s;" 
+            <div class="reveal" style="background:#0F172A;padding:clamp(1.5rem, 4vw, 3rem);position:relative;overflow:hidden;transition:background 0.3s;" 
                  onmouseenter="this.style.background='#1E293B'" 
                  onmouseleave="this.style.background='#0F172A'">
                 
@@ -1179,46 +1181,46 @@
                 </div>
                 
                 <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:2px;color:#475569;text-transform:uppercase;margin-bottom:0.6rem;">01 — Reseller Panel</div>
-                <h3 style="font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:1rem;">Your Own SMM Panel</h3>
-                <p style="color:#94A3B8;font-size:0.9rem;line-height:1.7;margin-bottom:2rem;">
+                <h3 style="font-size:clamp(1.1rem, 2.5vw, 1.4rem);font-weight:800;color:#fff;margin-bottom:1rem;">Your Own SMM Panel</h3>
+                <p style="color:#94A3B8;font-size:clamp(0.82rem, 1.5vw, 0.9rem);line-height:1.7;margin-bottom:2rem;">
                     Sell our services under your own brand. Set your own prices, manage your own customers, 
                     and keep 100% of your margin. No setup fees — just top up and go.
                 </p>
                 
                 <div style="display:flex;flex-direction:column;gap:0.7rem;margin-bottom:2.5rem;">
                     <div style="display:flex;align-items:center;gap:0.8rem;">
-                        <div style="width:20px;height:20px;background:rgba(5,150,105,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <div style="width:20px;height:20px;min-width:20px;background:rgba(5,150,105,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                             <i class="fas fa-check" style="color:#10B981;font-size:0.55rem;"></i>
                         </div>
-                        <span style="color:#94A3B8;font-size:0.85rem;">Custom pricing on all services</span>
+                        <span style="color:#94A3B8;font-size:clamp(0.8rem, 1.5vw, 0.85rem);">Custom pricing on all services</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:0.8rem;">
-                        <div style="width:20px;height:20px;background:rgba(5,150,105,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <div style="width:20px;height:20px;min-width:20px;background:rgba(5,150,105,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                             <i class="fas fa-check" style="color:#10B981;font-size:0.55rem;"></i>
                         </div>
-                        <span style="color:#94A3B8;font-size:0.85rem;">Manage customers & transactions</span>
+                        <span style="color:#94A3B8;font-size:clamp(0.8rem, 1.5vw, 0.85rem);">Manage customers & transactions</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:0.8rem;">
-                        <div style="width:20px;height:20px;background:rgba(5,150,105,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <div style="width:20px;height:20px;min-width:20px;background:rgba(5,150,105,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                             <i class="fas fa-check" style="color:#10B981;font-size:0.55rem;"></i>
                         </div>
-                        <span style="color:#94A3B8;font-size:0.85rem;">Instant order fulfillment</span>
+                        <span style="color:#94A3B8;font-size:clamp(0.8rem, 1.5vw, 0.85rem);">Instant order fulfillment</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:0.8rem;">
-                        <div style="width:20px;height:20px;background:rgba(5,150,105,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <div style="width:20px;height:20px;min-width:20px;background:rgba(5,150,105,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                             <i class="fas fa-check" style="color:#10B981;font-size:0.55rem;"></i>
                         </div>
-                        <span style="color:#94A3B8;font-size:0.85rem;">500+ services across all platforms</span>
+                        <span style="color:#94A3B8;font-size:clamp(0.8rem, 1.5vw, 0.85rem);">500+ services across all platforms</span>
                     </div>
                 </div>
                 
-                <a href="/register" class="btn btn-solid" style="display:inline-flex;align-items:center;gap:0.6rem;">
+                <a href="/register" class="btn btn-solid" style="display:inline-flex;align-items:center;gap:0.6rem;width:100%;justify-content:center;max-width:260px;">
                     Start Reselling &nbsp;<i class="fas fa-arrow-right"></i>
                 </a>
             </div>
 
             <!-- API Card -->
-            <div class="reveal" style="background:#0F172A;padding:3rem;position:relative;overflow:hidden;transition:background 0.3s;"
+            <div class="reveal" style="background:#0F172A;padding:clamp(1.5rem, 4vw, 3rem);position:relative;overflow:hidden;transition:background 0.3s;"
                  onmouseenter="this.style.background='#1E293B'"
                  onmouseleave="this.style.background='#0F172A'">
                 
@@ -1229,35 +1231,30 @@
                 </div>
                 
                 <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:2px;color:#475569;text-transform:uppercase;margin-bottom:0.6rem;">02 — Developer API</div>
-                <h3 style="font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:1rem;">Integrate via REST API</h3>
-                <p style="color:#94A3B8;font-size:0.9rem;line-height:1.7;margin-bottom:2rem;">
-                    Connect Booster directly to your own app, bot, or panel. 
+                <h3 style="font-size:clamp(1.1rem, 2.5vw, 1.4rem);font-weight:800;color:#fff;margin-bottom:1rem;">Integrate via REST API</h3>
+                <p style="color:#94A3B8;font-size:clamp(0.82rem, 1.5vw, 0.9rem);line-height:1.7;margin-bottom:2rem;">
+                    Connect Virextra directly to your own app, bot, or panel. 
                     Simple POST requests, instant responses. Get your API key and start building in minutes.
                 </p>
 
-                <!-- Code snippet -->
-                <div style="background:#020617;border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:1rem 1.2rem;margin-bottom:2rem;font-family:'DM Mono',monospace;font-size:0.72rem;line-height:1.8;overflow-x:auto;">
+                <div style="background:#020617;border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:1rem 1.2rem;margin-bottom:2rem;font-family:'DM Mono',monospace;font-size:clamp(0.65rem, 1.5vw, 0.72rem);line-height:1.8;overflow-x:auto;">
                     <div style="color:#475569;margin-bottom:0.3rem;">// Get all services</div>
                     <div><span style="color:#8B5CF6;">POST</span> <span style="color:#60A5FA;">{{ url('/api/v2') }}</span></div>
                     <div style="margin-top:0.5rem;"><span style="color:#94A3B8;">action</span> <span style="color:#475569;">=</span> <span style="color:#10B981;">"services"</span></div>
                     <div><span style="color:#94A3B8;">key</span> <span style="color:#475569;">=</span> <span style="color:#10B981;">"bst_xxxxxxxxxxxx"</span></div>
                 </div>
 
-                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
                     <a href="{{ route('api.docs') }}" class="btn" 
-                       style="background:rgba(139,92,246,0.15);color:#A78BFA;border:1px solid rgba(139,92,246,0.3);display:inline-flex;align-items:center;gap:0.6rem;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;letter-spacing:1.5px;text-transform:uppercase;padding:0.7rem 1.8rem;border-radius:4px;text-decoration:none;transition:all 0.3s;"
-                       onmouseenter="this.style.background='rgba(139,92,246,0.25)';this.style.borderColor='rgba(139,92,246,0.5)'"
-                       onmouseleave="this.style.background='rgba(139,92,246,0.15)';this.style.borderColor='rgba(139,92,246,0.3)'">
+                       style="background:rgba(139,92,246,0.15);color:#A78BFA;border:1px solid rgba(139,92,246,0.3);display:inline-flex;align-items:center;gap:0.6rem;flex:1;min-width:120px;justify-content:center;">
                         <i class="fas fa-book"></i> API Docs
                     </a>
-                    <a href="/register" class="btn btn-solid" style="display:inline-flex;align-items:center;gap:0.6rem;">
+                    <a href="/register" class="btn btn-solid" style="display:inline-flex;align-items:center;gap:0.6rem;flex:1;min-width:120px;justify-content:center;">
                         Get API Key &nbsp;<i class="fas fa-key"></i>
                     </a>
                     <a href="{{ route('api.test') }}" class="btn" 
-                       style="background:rgba(139,92,246,0.15);color:#A78BFA;border:1px solid rgba(139,92,246,0.3);display:inline-flex;align-items:center;gap:0.6rem;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;letter-spacing:1.5px;text-transform:uppercase;padding:0.7rem 1.8rem;border-radius:4px;text-decoration:none;transition:all 0.3s;"
-                       onmouseenter="this.style.background='rgba(139,92,246,0.25)';this.style.borderColor='rgba(139,92,246,0.5)'"
-                       onmouseleave="this.style.background='rgba(139,92,246,0.15)';this.style.borderColor='rgba(139,92,246,0.3)'">
-                        <i class="fas fa-book"></i> Test API
+                       style="background:rgba(139,92,246,0.15);color:#A78BFA;border:1px solid rgba(139,92,246,0.3);display:inline-flex;align-items:center;gap:0.6rem;flex:1;min-width:120px;justify-content:center;">
+                        <i class="fas fa-flask"></i> Test API
                     </a>
                 </div>
             </div>
@@ -1265,18 +1262,18 @@
         </div>
 
         <!-- Bottom stat bar -->
-        <div class="reveal" style="margin-top:1px;background:#0F172A;border:1px solid rgba(255,255,255,0.06);border-top:none;border-radius:0 0 12px 12px;padding:1.2rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
-            <div style="display:flex;gap:3rem;flex-wrap:wrap;">
+        <div class="reveal" style="background:#0F172A;border:1px solid rgba(255,255,255,0.06);border-top:none;border-radius:0 0 12px 12px;padding:1.2rem clamp(1rem, 3vw, 2rem);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+            <div style="display:flex;gap:clamp(1.5rem, 4vw, 3rem);flex-wrap:wrap;">
                 <div>
-                    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff;line-height:1;">500<span style="color:#3B82F6;">+</span></div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.4rem, 3vw, 1.8rem);color:#fff;line-height:1;">500<span style="color:#3B82F6;">+</span></div>
                     <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:1.5px;color:#475569;text-transform:uppercase;margin-top:2px;">Services</div>
                 </div>
                 <div>
-                    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff;line-height:1;">99.9<span style="color:#3B82F6;">%</span></div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.4rem, 3vw, 1.8rem);color:#fff;line-height:1;">99.9<span style="color:#3B82F6;">%</span></div>
                     <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:1.5px;color:#475569;text-transform:uppercase;margin-top:2px;">API Uptime</div>
                 </div>
                 <div>
-                    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff;line-height:1;">&lt;200<span style="color:#3B82F6;">ms</span></div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.4rem, 3vw, 1.8rem);color:#fff;line-height:1;">&lt;200<span style="color:#3B82F6;">ms</span></div>
                     <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:1.5px;color:#475569;text-transform:uppercase;margin-top:2px;">Avg Response</div>
                 </div>
             </div>
@@ -1327,18 +1324,18 @@
             <span class="outline">Viral</span><br>
             Today
         </h2>
-        <p class="reveal">Join 50,000+ creators and brands growing their presence with Booster.</p>
+        <p class="reveal">Join 50,000+ creators and brands growing their presence with Virextra.</p>
         <a href="/register" class="btn btn-solid btn-large reveal">Create Free Account</a>
     </section>
 
     <footer id="contact">
         <div class="footer-top">
             <div class="footer-brand">
-                <span class="logo-text">Boo<span>ster</span></span>
+                <span class="logo-text">Vir<span>extra</span></span>
                 <p>Your trusted partner for social media growth worldwide. Safe, fast, and built for results.</p>
                 <div class="footer-socials">
                     <a href="https://whatsapp.com/channel/0029Vb7I1e3JuyAL31rIia0r" target="_blank" class="soc-btn"><i class="fab fa-whatsapp"></i></a>
-                    <a href="https://www.tiktok.com/@booster3928" target="_blank" class="soc-btn"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.tiktok.com/@Virextra3928" target="_blank" class="soc-btn"><i class="fab fa-tiktok"></i></a>
                     <a href="#" class="soc-btn"><i class="fab fa-twitter"></i></a>
                     <a href="#" class="soc-btn"><i class="fab fa-instagram"></i></a>
                 </div>
@@ -1362,12 +1359,12 @@
             </div>
             <div class="footer-col">
                 <h4>Contact</h4>
-                <div class="contact-item"><i class="fas fa-envelope"></i> info@boosterr.xyz</div>
+                <div class="contact-item"><i class="fas fa-envelope"></i> info@Virextrar.xyz</div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2025 Booster. All rights reserved.</p>
-            <p>Booster is operated by Phastverse Enterprise.</p>
+            <p>© 2025 Virextra. All rights reserved.</p>
+            <p>Virextra is operated by Phastverse Enterprise.</p>
         </div>
     </footer>
 

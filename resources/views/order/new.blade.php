@@ -76,7 +76,7 @@
                                     
                                     <div class="collapse mt-3" id="orderDescription">
                                         <div class="card card-body bg-light">
-                                            <p class="mb-2">Welcome to Booster, let help you grow your social media account's.</p>
+                                            <p class="mb-2">Welcome to t.me/Virextrahq, let help you grow your social media account's.</p>
                                             <p class="mb-2">This section is packed with discounted services just for you. Same powerful results, but way easier on your wallet. 😉</p>
                                             <p class="mb-3">If you're unsure about our services, you can place an order with a very low price to test first before going bigger. It works on any social.</p>
                                             <p class="mb-3">🎵 TikTok • 📸 Instagram • 📱 Telegram • 🎮 Twitch • 📘 Facebook • 🎧 Spotify • 💬 WhatsApp • ▶️ YouTube • ✖️ Twitter • 👾 Discord • 👻 Snapchat • 💼 LinkedIn • 📌 Pinterest</p>
@@ -96,7 +96,7 @@
                                                 <p class="mb-0">➕ Avoid stacking multiple orders on the same link</p>
                                             </div>
                                             
-                                            <p class="mt-3 mb-0"><strong>At Booster, we're all about helping you grow.</strong> We encourage you to read the service description to understand each service before ordering so you always get maximum value.</p>
+                                            <p class="mt-3 mb-0"><strong>At t.me/Virextrahq, we're all about helping you grow.</strong> We encourage you to read the service description to understand each service before ordering so you always get maximum value.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -155,7 +155,7 @@
      */
     function cleanServiceName(name) {
         // Remove 'OGAVIRAL' (case insensitive)
-        let cleaned = name.replace(/OGAVIRAL/gi, 'BOOSTER');
+        let cleaned = name.replace(/OGAVIRAL/gi, 't.me/Virextrahq');
         
         // Remove leading/trailing special characters, spaces, dashes, pipes, bullets
         cleaned = cleaned.replace(/^[\s\-–—|•]+|[\s\-–—|•]+$/g, '');
@@ -192,7 +192,7 @@
             const option = document.createElement('option');
             option.value = service.service;
             
-            // Clean the service name (remove BOOSTER)
+            // Clean the service name (remove t.me/Virextrahq)
             const displayName = cleanServiceName(service.name);
             
             // Use marked_up_price if available, otherwise fall back to rate

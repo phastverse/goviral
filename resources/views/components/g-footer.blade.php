@@ -5,7 +5,7 @@
                 <p class="fs-11 text-muted fw-medium text-uppercase mb-0 copyright">
                     <span>Copyright ©</span>
                     <script>document.write(new Date().getFullYear());</script>
-                    <span class="ms-1">Booster. All rights reserved.</span>
+                    <span class="ms-1">Virextra. All rights reserved.</span>
                 </p>
             </div>
             <div class="col-md-6">
@@ -53,7 +53,7 @@
         <div class="support-modal-body">
             <p class="text-muted mb-4">How would you like to chat with us?</p>
             <div class="support-options">
-                <a href="t.me/boosterhq" target="_blank" class="support-option">
+                <a href="t.me/Virextrahq" target="_blank" class="support-option">
                     <div class="support-option-icon whatsapp">
                         <i class="feather-message-square"></i>
                     </div>

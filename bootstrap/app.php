@@ -17,16 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('web')
                 ->group(base_path('routes/admin.php'));
 
-            // RESELLER ROUTES via subdomain — e.g. acme.boosterr.xyz
+            // RESELLER ROUTES via subdomain — e.g. acme.virextra.com
             Route::middleware('web')
-                ->domain('{subdomain}.' . env('APP_BASE_DOMAIN', 'boosterr.xyz'))
+                ->domain('{subdomain}.' . env('APP_BASE_DOMAIN', 'virextra.com'))
                 ->group(base_path('routes/reseller.php'));
-
+ 
             // RESELLER ROUTES via custom domain — e.g. panel.acme.ng
             // We can't use a domain() constraint here since we don't know the domain ahead of time.
             // Instead we load the reseller routes for ANY request that doesn't match the main domain
             // or a subdomain. The EnsureResellerPanel middleware will abort if no reseller is found.
-            $baseDomain = env('APP_BASE_DOMAIN', 'boosterr.xyz');
+            $baseDomain = env('APP_BASE_DOMAIN', 'virextra.com');
             $host = request()->getHost();
 
             $isMainDomain   = $host === $baseDomain;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booster API Tester</title>
+    <title>Virextra API Tester</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -431,14 +431,14 @@
             .nav-item.active { border-bottom-color: var(--accent); border-left-color: transparent; }
             .content { grid-template-columns: 1fr; }
             .request-panel { border-right: none; border-bottom: 1px solid var(--border); }
-        }
+        } 
     </style>
 </head>
 <body>
 
 <!-- TOPBAR -->
 <header class="topbar">
-    <div class="topbar-logo">Boo<span>ster</span> <span style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:2px;">API TESTER</span></div>
+    <div class="topbar-logo">Vir<span>extra</span> <span style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:2px;">API TESTER</span></div>
     <div class="topbar-right">
         <div class="status-dot"></div>
         <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:1px;">LIVE</span>

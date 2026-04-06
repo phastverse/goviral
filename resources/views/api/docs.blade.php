@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booster API Documentation</title>
+    <title>Virextra API Documentation</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,7 +59,7 @@
 
 <aside class="sidebar">
     <div class="sidebar-logo">
-        <h2>Booster <span>API</span></h2>
+        <h2>Virextra <span>API</span></h2>
         <small>v2.0 Documentation</small>
         <a href="/api/test" class="btn btn-solid" style="display:inline-flex;align-items:center;gap:0.6rem; color: white;">
            TEST API&nbsp;<i class="fas fa-key"></i>
@@ -84,8 +84,8 @@
 
 <main class="main">
 
-    <h1>Booster API</h1>
-    <p>Integrate Booster's SMM services directly into your application, bot, or reseller panel with our simple REST API.</p>
+    <h1>Virextra API</h1>
+    <p>Integrate Virextra's SMM services directly into your application, bot, or reseller panel with our simple REST API.</p>
 
     <div class="base-url-box">
         <span>Base URL</span>
@@ -329,7 +329,7 @@
     </div>
 
     <p style="margin-top: 48px; padding-top: 24px; border-top: 1px solid #2d3748; color: #4a5568; font-size: 12px; text-align: center;">
-        Booster API v2.0 · <a href="{{ route('support.index') }}" style="color: #6366f1;">Contact Support</a>
+        Virextra API v2.0 · <a href="{{ route('support.index') }}" style="color: #6366f1;">Contact Support</a>
     </p>
 
 </main>
