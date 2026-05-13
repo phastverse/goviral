@@ -14,7 +14,7 @@
                 <li class="nxl-item nxl-caption">
                     <label>Admin Panel</label>
                 </li>
-                
+
                 <!-- Dashboard -->
                 <li class="nxl-item">
                     <a href="{{ route('admin.dashboard') }}" class="nxl-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -47,7 +47,7 @@
                     </a>
                 </li>
 
-                {{-- Reseller Panels --}}
+                <!-- Reseller Panels -->
                 <li class="nxl-item">
                     <a href="{{ route('admin.resellers.index') }}"
                        class="nxl-link {{ request()->routeIs('admin.resellers.*') ? 'active' : '' }}">
@@ -55,20 +55,65 @@
                         <span class="nxl-mtext">Reseller Panels</span>
                     </a>
                 </li>
-                <!--Pricing-->
+
+                <!-- Providers dropdown (Super Admin only) -->
                 @if(auth('admin')->user()->isSuperAdmin())
-                    <li class="nxl-item">
-                        <a href="{{ route('admin.settings.pricing.index') }}" class="nxl-link {{ request()->routeIs('admin.settings.pricing.*') ? 'active' : '' }}">
-                            <span class="nxl-micon"><i class="feather-percent"></i></span>
-                            <span class="nxl-mtext">Pricing Config</span>
-                        </a>
-                    </li>
+                <li class="nxl-item nxl-hasmenu {{ request()->routeIs('admin.providers.*') || request()->routeIs('admin.exchange-rates.*') ? 'nxl-trigger' : '' }}">
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-server"></i></span>
+                        <span class="nxl-mtext">Providers</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    <ul class="nxl-submenu">
+
+                        <!-- API Providers -->
+                        <li class="nxl-item">
+                            <a class="nxl-link {{ request()->routeIs('admin.providers.*') ? 'active' : '' }}"
+                               href="{{ route('admin.providers.index') }}">
+                                <i class="feather-server me-2" style="font-size:12px;"></i>
+                                API Providers
+                                @php $activeProviderCount = \App\Models\Provider::active()->count(); @endphp
+                                @if($activeProviderCount > 0)
+                                    <span class="badge bg-success ms-1" style="font-size:9px;">{{ $activeProviderCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+
+                        <!-- Exchange Rates -->
+                        <li class="nxl-item">
+                            <a class="nxl-link {{ request()->routeIs('admin.exchange-rates.*') ? 'active' : '' }}"
+                               href="{{ route('admin.exchange-rates.index') }}">
+                                <i class="feather-dollar-sign me-2" style="font-size:12px;"></i>
+                                Exchange Rates
+                                @php
+                                    $staleRateCount = \App\Models\ExchangeRate::where('fetched_at', '<', now()->subMinutes(30))->count();
+                                @endphp
+                                @if($staleRateCount > 0)
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:9px;" title="{{ $staleRateCount }} stale">!</span>
+                                @endif
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
                 @endif
 
-                <!-- Refreral -->
+                <!-- Pricing Config (Super Admin only) -->
+                @if(auth('admin')->user()->isSuperAdmin())
+                <li class="nxl-item">
+                    <a href="{{ route('admin.settings.pricing.index') }}"
+                       class="nxl-link {{ request()->routeIs('admin.settings.pricing.*') ? 'active' : '' }}">
+                        <span class="nxl-micon"><i class="feather-percent"></i></span>
+                        <span class="nxl-mtext">Pricing Config</span>
+                    </a>
+                </li>
+                @endif
+
+                <!-- Referral -->
                 @if(auth('admin')->user()->canManageReferral())
                 <li class="nxl-item">
-                    <a href="{{ route('admin.referral.withdrawals.index') }}" class="nxl-link {{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.referral.withdrawals.index') }}"
+                       class="nxl-link {{ request()->routeIs('admin.referral.*') ? 'active' : '' }}">
                         <span class="nxl-micon"><i class="feather-gift"></i></span>
                         <span class="nxl-mtext">Referral</span>
                     </a>
@@ -77,13 +122,14 @@
 
                 <!-- Support Tickets -->
                 <li class="nxl-item">
-                    <a href="{{ route('admin.support.index') }}" class="nxl-link {{ request()->routeIs('admin.support.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.support.index') }}"
+                       class="nxl-link {{ request()->routeIs('admin.support.*') ? 'active' : '' }}">
                         <span class="nxl-micon"><i class="feather-life-buoy"></i></span>
                         <span class="nxl-mtext">Support</span>
                     </a>
                 </li>
 
-                <!-- Admins Management (Super Admin & HR Only) -->
+                <!-- Admins Management -->
                 @if(auth('admin')->user()->canManageAdmins())
                 <li class="nxl-item nxl-hasmenu {{ request()->routeIs('admin.admins.*') ? 'nxl-trigger' : '' }}">
                     <a href="javascript:void(0);" class="nxl-link">
@@ -93,11 +139,11 @@
                     </a>
                     <ul class="nxl-submenu">
                         <li class="nxl-item">
-                            <a class="nxl-link {{ request()->routeIs('admin.admins.index') ? 'active' : '' }}" 
+                            <a class="nxl-link {{ request()->routeIs('admin.admins.index') ? 'active' : '' }}"
                                href="{{ route('admin.admins.index') }}">All Admins</a>
                         </li>
                         <li class="nxl-item">
-                            <a class="nxl-link {{ request()->routeIs('admin.admins.create') ? 'active' : '' }}" 
+                            <a class="nxl-link {{ request()->routeIs('admin.admins.create') ? 'active' : '' }}"
                                href="{{ route('admin.admins.create') }}">Add New Admin</a>
                         </li>
                     </ul>
@@ -109,7 +155,7 @@
                 </li>
 
                 <!-- Settings -->
-                <li class="nxl-item nxl-hasmenu {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
+                <li class="nxl-item nxl-hasmenu {{ request()->routeIs('admin.profile.*') ? 'nxl-trigger' : '' }}">
                     <a href="javascript:void(0);" class="nxl-link">
                         <span class="nxl-micon"><i class="feather-settings"></i></span>
                         <span class="nxl-mtext">Settings</span>
@@ -117,12 +163,14 @@
                     </a>
                     <ul class="nxl-submenu">
                         <li class="nxl-item">
-                            <a href="{{ route('admin.profile.show') }}" class="nxl-link {{ request()->routeIs('admin.profile.show') ? 'active' : '' }}">
+                            <a href="{{ route('admin.profile.show') }}"
+                               class="nxl-link {{ request()->routeIs('admin.profile.show') ? 'active' : '' }}">
                                 My Profile
                             </a>
                         </li>
                     </ul>
                 </li>
+
                 <!-- Logout -->
                 <li class="nxl-item">
                     <form method="POST" action="{{ route('admin.logout') }}">

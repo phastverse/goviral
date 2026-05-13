@@ -23,7 +23,7 @@
 
             <div class="main-content">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-12"> 
                         <div class="card stretch stretch-full">
                             <div class="card-header">
                                 <div class="d-flex justify-content-between align-items-center w-100">

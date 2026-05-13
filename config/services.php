@@ -56,4 +56,10 @@ return [
         'currency' => env('KORAPAY_CURRENCY', 'NGN'),
     ],
 
+    'tiktok' => [
+        'pixel_code' => env('TIKTOK_PIXEL_CODE'),
+        'access_token' => env('TIKTOK_ACCESS_TOKEN'),
+        'enabled' => env('TIKTOK_ENABLED', false),
+    ],
+
 ];

@@ -23,7 +23,7 @@
                                             Frequently Asked Questions
                                         </h1>
                                         <p class="lead mb-0 mx-auto faq-hero-subtitle" style="max-width: 600px;">
-                                            Find quick answers to common questions about Booster. 
+                                            Find quick answers to common questions about Virextra. 
                                             Can't find what you're looking for? Our 24/7 support team is here to help!
                                         </p>
                                     </div>
@@ -119,13 +119,13 @@
                                                                 <h2 class="accordion-header">
                                                                     <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#general1">
                                                                         <i class="feather-chevron-right me-2 accordion-icon"></i>
-                                                                        What is Booster?
+                                                                        What is Virextra?
                                                                     </button>
                                                                 </h2>
                                                                 <div id="general1" class="accordion-collapse collapse show" data-bs-parent="#generalAccordion">
                                                                     <div class="accordion-body pt-0">
                                                                         <p class="mb-3">
-                                                                            Booster is a leading social media growth platform that helps individuals, businesses, 
+                                                                            Virextra is a leading social media growth platform that helps individuals, businesses, 
                                                                             and influencers grow their social media presence across multiple platforms including 
                                                                             Instagram, TikTok, Twitter/X, YouTube, Facebook, and more.
                                                                         </p>
@@ -141,7 +141,7 @@
                                                                 <h2 class="accordion-header">
                                                                     <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#general2">
                                                                         <i class="feather-chevron-right me-2 accordion-icon"></i>
-                                                                        Is Booster safe to use?
+                                                                        Is Virextra safe to use?
                                                                     </button>
                                                                 </h2>
                                                                 <div id="general2" class="accordion-collapse collapse" data-bs-parent="#generalAccordion">
@@ -430,7 +430,7 @@
                                                                         <p class="mb-3">Our wallet system makes ordering quick and easy:</p>
                                                                         @php
                                                                             $walletSteps = [
-                                                                                ['icon' => 'feather-plus', 'color' => 'bg-primary', 'title' => 'Deposit funds', 'sub' => 'Add money to your Booster wallet'],
+                                                                                ['icon' => 'feather-plus', 'color' => 'bg-primary', 'title' => 'Deposit funds', 'sub' => 'Add money to your Virextra wallet'],
                                                                                 ['icon' => 'feather-shopping-cart', 'color' => 'bg-success', 'title' => 'Place orders instantly', 'sub' => 'Use wallet balance for fast checkout'],
                                                                                 ['icon' => 'feather-list', 'color' => 'bg-info', 'title' => 'Track transactions', 'sub' => 'View complete wallet history'],
                                                                                 ['icon' => 'feather-refresh-cw', 'color' => 'bg-warning', 'title' => 'Get refunds', 'sub' => 'Refunds credited back to wallet'],
@@ -482,7 +482,7 @@
                                                                 </h2>
                                                                 <div id="payment4" class="accordion-collapse collapse" data-bs-parent="#paymentAccordion">
                                                                     <div class="accordion-body pt-0">
-                                                                        <p class="mb-3">All refunds are processed to your Booster wallet. You can then use that balance for future orders.</p>
+                                                                        <p class="mb-3">All refunds are processed to your Virextra wallet. You can then use that balance for future orders.</p>
                                                                         <div class="faq-option-card faq-option-primary p-3 rounded text-center">
                                                                             <i class="feather-shopping-cart fs-2 text-primary mb-2 d-block"></i>
                                                                             <strong>Use balance for future orders</strong>

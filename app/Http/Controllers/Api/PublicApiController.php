@@ -4,30 +4,27 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Services\BoosterService;
+use App\Services\ProviderService;
 use App\Services\WalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class PublicApiController extends Controller
 {
-    protected $boosterService;
+    protected ProviderService $providerService;
 
-    public function __construct(BoosterService $boosterService)
+    public function __construct(ProviderService $providerService)
     {
-        $this->boosterService = $boosterService;
+        $this->providerService = $providerService;
     }
 
     public function handle(Request $request)
     {
         $action = $request->input('action');
 
-        // Services doesn't need auth
-        if ($action === 'services') {
-            return $this->services($request);
-        }
+        if ($action === 'services') return $this->services($request);
 
-        return match($action) {
+        return match ($action) {
             'add'           => $this->addOrder($request),
             'status'        => $request->has('orders')
                                 ? $this->multipleOrderStatus($request)
@@ -45,36 +42,27 @@ class PublicApiController extends Controller
         return $request->attributes->get('api_user');
     }
 
-    /**
-     * GET services list
-     */
     public function services(Request $request)
     {
-        $services = $this->boosterService->getServices();
+        $services = $this->providerService->getServices();
 
         if (empty($services)) {
             return response()->json(['error' => 'Unable to fetch services'], 500);
         }
 
-        // Clean response — never expose upstream provider
-        $cleaned = collect($services)->map(function ($service) {
-            return [
-                'service'  => $service['service'],
-                'name'     => $this->cleanName($service['name']),
-                'type'     => $service['type'] ?? 'Default',
-                'category' => $this->cleanName($service['category'] ?? ''),
-                'rate'     => $service['marked_up_price'] ?? $service['rate'],
-                'min'      => $service['min'],
-                'max'      => $service['max'],
-            ];
-        })->values();
+        $cleaned = collect($services)->map(fn($service) => [
+            'service'  => $service['service'],
+            'name'     => $this->cleanName($service['name']),
+            'type'     => $service['type'] ?? 'Default',
+            'category' => $this->cleanName($service['category'] ?? ''),
+            'rate'     => $service['marked_up_price'] ?? $service['rate'],
+            'min'      => $service['min'],
+            'max'      => $service['max'],
+        ])->values();
 
         return response()->json($cleaned);
     }
 
-    /**
-     * POST add order
-     */
     public function addOrder(Request $request)
     {
         $user = $this->apiUser($request);
@@ -85,49 +73,40 @@ class PublicApiController extends Controller
             'quantity' => 'required|integer|min:10',
         ]);
 
-        // Fetch services and find the requested one
-        $services = $this->boosterService->getServices();
+        $services    = $this->providerService->getServices();
         $serviceData = collect($services)->firstWhere('service', (int) $request->service);
 
         if (!$serviceData) {
             return response()->json(['error' => 'Service not found'], 404);
         }
 
-        // Validate quantity limits
         if ($request->quantity < $serviceData['min'] || $request->quantity > $serviceData['max']) {
             return response()->json([
-                'error' => "Quantity must be between {$serviceData['min']} and {$serviceData['max']}"
+                'error' => "Quantity must be between {$serviceData['min']} and {$serviceData['max']}",
             ], 422);
         }
 
-        // Calculate charge using marked up price
         $rate   = $serviceData['marked_up_price'] ?? $serviceData['rate'];
         $charge = round(($request->quantity / 1000) * $rate, 2);
 
-        // Check balance
         if ($user->balance < $charge) {
             return response()->json(['error' => 'Insufficient balance'], 402);
         }
 
         $reference = 'API-ORD-' . strtoupper(Str::random(8));
 
-        // Deduct wallet
-        WalletService::withdraw(
-            $user,
-            $charge,
-            $reference,
-            'API Order Debit',
-            "API Order for: " . $this->cleanName($serviceData['name'])
+        WalletService::withdraw($user, $charge, $reference, 'API Order Debit',
+            "API Order for: " . $this->cleanName($serviceData['name']));
+
+        // Place via ProviderService (auto-fallback across all active providers)
+        $result = $this->providerService->placeOrder(
+            $request->service, $request->link, $request->quantity
         );
 
-        // Place order with upstream
-        $apiResponse = $this->boosterService->placeOrder(
-            $request->service,
-            $request->link,
-            $request->quantity
-        );
+        if ($result !== null) {
+            $apiResponse    = $result['response'];
+            $chosenProvider = $result['provider'];
 
-        if (isset($apiResponse['order']) && is_numeric($apiResponse['order'])) {
             $order = Order::create([
                 'user_id'      => $user->id,
                 'service_id'   => $request->service,
@@ -138,22 +117,20 @@ class PublicApiController extends Controller
                 'status'       => 'processing',
                 'api_order_id' => $apiResponse['order'],
                 'api_response' => json_encode($apiResponse),
+                'provider_id'  => $chosenProvider->id,  // ← track provider
             ]);
 
             return response()->json(['order' => $order->id]);
         }
 
-        // Refund on failure
+        // All providers failed — refund
         WalletService::refund($user, $charge, 'API Order Failed', $reference);
 
         return response()->json([
-            'error' => $apiResponse['error'] ?? 'Order failed. Your balance has been refunded.'
+            'error' => 'Order failed. Your balance has been refunded.',
         ], 500);
     }
 
-    /**
-     * GET order status
-     */
     public function orderStatus(Request $request)
     {
         $user  = $this->apiUser($request);
@@ -161,54 +138,41 @@ class PublicApiController extends Controller
                       ->where('user_id', $user->id)
                       ->first();
 
-        if (!$order) {
-            return response()->json(['error' => 'Order not found'], 404);
-        }
+        if (!$order) return response()->json(['error' => 'Order not found'], 404);
 
-        // Fetch live status from upstream
+        $status = [];
         if ($order->api_order_id) {
-            $status = $this->boosterService->getOrderStatus($order->api_order_id);
+            $status = $this->providerService->getOrderStatus($order->api_order_id, $order->provider_id);
             if (isset($status['status'])) {
                 $order->update(['status' => $this->mapStatus($status['status'])]);
             }
         }
 
         return response()->json([
-            'order'    => $order->id,
-            'status'   => $order->status,
-            'charge'   => $order->charge,
+            'order'       => $order->id,
+            'status'      => $order->status,
+            'charge'      => $order->charge,
             'start_count' => $status['start_count'] ?? null,
-            'remains'  => $status['remains'] ?? null,
+            'remains'     => $status['remains'] ?? null,
         ]);
     }
 
-    /**
-     * GET multiple order statuses
-     */
     public function multipleOrderStatus(Request $request)
     {
         $user     = $this->apiUser($request);
         $orderIds = explode(',', $request->input('orders', ''));
 
-        $orders = Order::whereIn('id', $orderIds)
-                       ->where('user_id', $user->id)
-                       ->get();
+        $orders = Order::whereIn('id', $orderIds)->where('user_id', $user->id)->get();
 
-        $result = [];
-        foreach ($orders as $order) {
-            $result[$order->id] = [
-                'status'  => $order->status,
-                'charge'  => $order->charge,
+        return response()->json(
+            $orders->keyBy('id')->map(fn($o) => [
+                'status'  => $o->status,
+                'charge'  => $o->charge,
                 'remains' => null,
-            ];
-        }
-
-        return response()->json($result);
+            ])
+        );
     }
 
-    /**
-     * POST create refill
-     */
     public function createRefill(Request $request)
     {
         $user  = $this->apiUser($request);
@@ -220,7 +184,7 @@ class PublicApiController extends Controller
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-        $response = $this->boosterService->createRefill($order->api_order_id);
+        $response = $this->providerService->createRefill($order->api_order_id, $order->provider_id);
 
         if (isset($response['refill'])) {
             return response()->json(['refill' => $response['refill']]);
@@ -229,13 +193,18 @@ class PublicApiController extends Controller
         return response()->json(['error' => $response['error'] ?? 'Refill failed'], 500);
     }
 
-    /**
-     * GET refill status
-     */
     public function refillStatus(Request $request)
     {
+        // Refill status check needs a provider — try any active one
         $refillId = $request->input('refill');
-        $response = $this->boosterService->getRefillStatus($refillId);
+        $provider = \App\Models\Provider::active()->byPriority()->first();
+
+        if (!$provider) {
+            return response()->json(['refill' => $refillId, 'status' => 'unknown']);
+        }
+
+        $api      = new \App\Services\ProviderApiService($provider);
+        $response = $api->post(['action' => 'refill_status', 'refill' => $refillId]);
 
         return response()->json([
             'refill' => $refillId,
@@ -243,9 +212,6 @@ class PublicApiController extends Controller
         ]);
     }
 
-    /**
-     * POST cancel orders
-     */
     public function cancelOrders(Request $request)
     {
         $user     = $this->apiUser($request);
@@ -260,16 +226,21 @@ class PublicApiController extends Controller
             return response()->json(['error' => 'No cancellable orders found'], 404);
         }
 
+        // Use the first order's provider if available, otherwise pick any
+        $firstOrder = $orders->first();
+        $provider   = $firstOrder->provider ?? \App\Models\Provider::active()->byPriority()->first();
+
+        if (!$provider) {
+            return response()->json(['error' => 'No provider available'], 503);
+        }
+
+        $api         = new \App\Services\ProviderApiService($provider);
         $apiOrderIds = $orders->pluck('api_order_id')->filter()->values()->toArray();
+        $response    = $api->post(['action' => 'cancel', 'orders' => implode(',', $apiOrderIds)]);
 
-        $response = $this->boosterService->cancelOrders($apiOrderIds);
-
-        return response()->json($response);
+        return response()->json($response ?? ['error' => 'Cancel failed']);
     }
 
-    /**
-     * GET wallet balance
-     */
     public function balance(Request $request)
     {
         $user = $this->apiUser($request);
@@ -280,14 +251,12 @@ class PublicApiController extends Controller
         ]);
     }
 
-    protected function cleanName($name): string
+    protected function cleanName(string $name): string
     {
-        $cleaned = preg_replace('/\bogaviral\b/i', 'Booster', $name);
-        $cleaned = trim(preg_replace('/\s+/', ' ', $cleaned));
-        return $cleaned;
+        return trim(preg_replace('/\s+/', ' ', preg_replace('/\bogaviral\b/i', 'Booster', $name)));
     }
 
-    protected function mapStatus($apiStatus): string
+    protected function mapStatus(string $apiStatus): string
     {
         return [
             'Pending'     => 'pending',

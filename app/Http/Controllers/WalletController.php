@@ -32,7 +32,7 @@ class WalletController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:100',
+            'amount' => 'required|numeric|min:500',
         ]);
 
         $amount = $request->amount;

@@ -92,7 +92,7 @@
                                                         <div class="flex-grow-1">
                                                             <h4 class="fw-bold mb-2">Agreement to Terms</h4>
                                                             <p class="text-muted mb-0">
-                                                                Welcome to Booster! By accessing and using our social media growth services, 
+                                                                Welcome to Virextra! By accessing and using our social media growth services, 
                                                                 you agree to be bound by these Terms of Use. Please read them carefully.
                                                             </p>
                                                         </div>
@@ -148,7 +148,7 @@
                                                             <i class="feather-check-circle text-success fs-4"></i>
                                                             <div>
                                                                 <strong class="d-block mb-2">2.1 What We Offer</strong>
-                                                                <p class="text-muted mb-0">Booster provides social media growth services including followers, likes, views, comments, and other engagement metrics across various platforms.</p>
+                                                                <p class="text-muted mb-0">Virextra provides social media growth services including followers, likes, views, comments, and other engagement metrics across various platforms.</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -188,8 +188,8 @@
                                                     <div class="row g-3">
                                                         @php
                                                             $payments = [
-                                                                ['icon'=>'feather-wallet',      'id'=>'3.1','title'=>'Wallet System',   'text'=>'All purchases are made using credits in your Booster wallet.'],
-                                                                ['icon'=>'feather-dollar-sign', 'id'=>'3.2','title'=>'Deposits',        'text'=>'Wallet deposits are final and can only be used for placing orders on Booster.'],
+                                                                ['icon'=>'feather-wallet',      'id'=>'3.1','title'=>'Wallet System',   'text'=>'All purchases are made using credits in your Virextra wallet.'],
+                                                                ['icon'=>'feather-dollar-sign', 'id'=>'3.2','title'=>'Deposits',        'text'=>'Wallet deposits are final and can only be used for placing orders on Virextra.'],
                                                                 ['icon'=>'feather-tag',         'id'=>'3.3','title'=>'Pricing',         'text'=>'All prices are displayed in Nigerian Naira (₦) and are subject to change without notice.'],
                                                                 ['icon'=>'feather-zap',         'id'=>'3.4','title'=>'Order Deduction', 'text'=>'Funds are deducted from your wallet immediately when an order is placed.'],
                                                             ];
@@ -318,7 +318,7 @@
                                                         <div class="col-md-6">
                                                             <div class="terms-soft-card p-3 rounded">
                                                                 <strong class="d-block mb-2">7.1 Our Content</strong>
-                                                                <p class="text-muted small mb-0">All content on Booster, including logos, text, graphics, and software, is our property.</p>
+                                                                <p class="text-muted small mb-0">All content on Virextra, including logos, text, graphics, and software, is our property.</p>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
@@ -471,7 +471,7 @@
                                                         <div class="d-flex align-items-start gap-2">
                                                             <i class="feather-info text-primary mt-1"></i>
                                                             <p class="mb-0 small">
-                                                                By using Booster services, you acknowledge that you have read, understood, 
+                                                                By using Virextra services, you acknowledge that you have read, understood, 
                                                                 and agree to be bound by these Terms of Use. 
                                                                 <strong>Last updated: 20 Jan 2026</strong>
                                                             </p>

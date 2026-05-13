@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\PricingConfigController;
 use App\Http\Controllers\Admin\AdminResellerController;
+use App\Http\Controllers\Admin\ProviderController;
+use App\Http\Controllers\Admin\ExchangeRateController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -120,6 +122,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/{reseller}/customers', [AdminResellerController::class, 'customers'])->name('customers');
             Route::get('/{reseller}/orders',    [AdminResellerController::class, 'orders'])->name('orders');
             Route::get('/{reseller}/wallet',    [AdminResellerController::class, 'wallet'])->name('wallet');
+        });
+
+            Route::prefix('providers')->name('providers.')->group(function () {
+                Route::get('/',                         [ProviderController::class, 'index'])->name('index');
+                Route::get('/create',                   [ProviderController::class, 'create'])->name('create');
+                Route::post('/',                        [ProviderController::class, 'store'])->name('store');
+                Route::get('/{provider}/edit',          [ProviderController::class, 'edit'])->name('edit');
+                Route::put('/{provider}',               [ProviderController::class, 'update'])->name('update');
+                Route::delete('/{provider}',            [ProviderController::class, 'destroy'])->name('destroy');
+                Route::post('/{provider}/toggle',       [ProviderController::class, 'toggle'])->name('toggle');
+                Route::post('/{provider}/refresh-balance', [ProviderController::class, 'refreshBalance'])->name('refresh-balance');
+                Route::post('/refresh-all-balances',    [ProviderController::class, 'refreshAllBalances'])->name('refresh-all');
+            });
+
+        Route::prefix('exchange-rates')->name('exchange-rates.')->group(function () {
+            Route::get('/',           [ExchangeRateController::class, 'index'])->name('index');
+            Route::post('/refresh',   [ExchangeRateController::class, 'refresh'])->name('refresh');
+            Route::post('/refresh-all', [ExchangeRateController::class, 'refreshAll'])->name('refresh-all');
         });
         
     });

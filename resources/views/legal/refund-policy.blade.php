@@ -88,7 +88,7 @@
                                                         <div class="flex-grow-1">
                                                             <h4 class="fw-bold mb-2">Our Commitment to You</h4>
                                                             <p class="text-muted mb-0">
-                                                                At Booster, we strive to provide the best social media growth services. 
+                                                                At Virextra, we strive to provide the best social media growth services. 
                                                                 This refund policy outlines the circumstances under which refunds may be issued. 
                                                                 Please read this policy carefully before placing an order.
                                                             </p>
@@ -268,7 +268,7 @@
                                                             <i class="feather-info text-info mt-1"></i>
                                                             <div>
                                                                 <strong>Important:</strong>
-                                                                <p class="mb-0 mt-1">All refunds are credited to your Booster wallet and can be used for future orders. Wallet funds cannot be withdrawn to bank accounts.</p>
+                                                                <p class="mb-0 mt-1">All refunds are credited to your Virextra wallet and can be used for future orders. Wallet funds cannot be withdrawn to bank accounts.</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -285,7 +285,7 @@
                                                     <div class="refund-soft-card p-4 rounded">
                                                         @php
                                                             $steps = [
-                                                                'Log in to your Booster account',
+                                                                'Log in to your Virextra account',
                                                                 'Navigate to Support section',
                                                                 'Create a new support ticket',
                                                                 'Select category: "Refund Request"',

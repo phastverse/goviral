@@ -11,14 +11,13 @@ use App\Http\Controllers\ApiKeyController;
 use App\Http\Controllers\ResellerPanelController;
 use App\Http\Controllers\ResellerServiceController;
 use App\Http\Controllers\Reseller;
-
+ 
 // RESELLER SUBDOMAIN ROUTES - Must come first
 // Route::domain('{subdomain}.' . config('app.base_domain', 'lvh.me'))->group(function () {
 //     // Load all reseller routes
 //     require base_path('routes/reseller.php');
 // });
 
-Route::domain(str_replace(':8000', '', request()->getHost()))->group(function () {
 
 Route::get('/', function () {
     return view('welcome');
@@ -116,5 +115,3 @@ Route::middleware('auth')->group(function () {
 
 
 require __DIR__.'/auth.php';
-
-});

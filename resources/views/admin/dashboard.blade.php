@@ -4,7 +4,7 @@
 
 <main class="nxl-container">
     <div class="nxl-content">
-        
+         
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-header-left d-flex align-items-center">
@@ -217,28 +217,62 @@
 
                 @if(!auth('admin')->user()->isSupport())
                 @if(auth('admin')->user()->canEditOrders())
+                {{-- Provider Balances (one card per provider) --}}
+                @php $dashProviders = \App\Models\Provider::orderBy('priority')->get(); @endphp
+                 
+                @foreach($dashProviders as $dashProvider)
                 <div class="col-xxl-3 col-md-6">
-                    <div class="card stretch stretch-full">
+                    <div class="card stretch stretch-full {{ $dashProvider->is_active ? '' : 'opacity-50' }}">
                         <div class="card-body">
                             <div class="d-flex align-items-start justify-content-between mb-4">
-                                <div class="d-flex gap-4 align-items-center">
-                                    <div class="avatar-text avatar-lg bg-info-subtle">
-                                        <i class="feather-server text-info"></i>
+                                <div class="d-flex gap-3 align-items-center">
+                                    <div class="avatar-text avatar-lg {{ $dashProvider->is_active ? 'bg-info-subtle' : 'bg-secondary-subtle' }}">
+                                        <i class="feather-server {{ $dashProvider->is_active ? 'text-info' : 'text-secondary' }}"></i>
                                     </div>
                                     <div>
                                         <div class="fs-4 fw-bold text-dark">
-                                            {{ $ogaviralBalance !== null ? '₦' . number_format($ogaviralBalance, 2) : 'Unavailable' }}
+                                            @if($dashProvider->cached_balance !== null)
+                                                ₦{{ number_format($dashProvider->cached_balance, 2) }}
+                                            @else
+                                                <span class="text-muted fs-5">N/A</span>
+                                            @endif
                                         </div>
-                                        <h3 class="fs-13 fw-semibold text-truncate-1-line">Ogaviral API Balance</h3>
+                                        <h3 class="fs-13 fw-semibold text-truncate-1-line">{{ $dashProvider->name }}</h3>
                                     </div>
                                 </div>
+                                <span class="badge {{ $dashProvider->is_active ? 'bg-soft-success text-success' : 'bg-soft-secondary text-secondary' }}">
+                                    {{ $dashProvider->is_active ? 'Active' : 'Off' }}
+                                </span>
                             </div>
-                            <div class="pt-4 border-top">
-                                <span class="fs-12 fw-medium text-muted">Provider account balance</span>
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="fs-11 text-muted">
+                                    Priority {{ $dashProvider->priority }} ·
+                                    {{ $dashProvider->balance_checked_at ? $dashProvider->balance_checked_at->diffForHumans() : 'never refreshed' }}
+                                </span>
+                                <form method="POST" action="{{ route('admin.providers.refresh-balance', $dashProvider->id) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-xs btn-light" title="Refresh">
+                                        <i class="feather-refresh-cw" style="font-size:11px;"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
+                @endforeach
+                 
+                @if($dashProviders->isEmpty())
+                <div class="col-xxl-3 col-md-6">
+                    <div class="card stretch stretch-full">
+                        <div class="card-body text-center text-muted py-4">
+                            <i class="feather-server fs-3 d-block mb-2"></i>
+                            No providers configured.
+                            <a href="{{ route('admin.providers.create') }}" class="d-block mt-1">Add one</a>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                 
                 @endif
                 <!-- REVENUE STATISTICS -->
                 <div class="col-xxl-4 col-md-6">

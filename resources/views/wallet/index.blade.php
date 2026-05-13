@@ -55,7 +55,7 @@
                                     @csrf
                                     <div class="mb-3">
                                         <label class="form-label">Amount (₦)</label>
-                                        <input type="number" name="amount" class="form-control form-control-lg" placeholder="e.g. 5000" min="100" required>
+                                        <input type="number" name="amount" class="form-control form-control-lg" placeholder="e.g. 5000" min="500" required>
                                     </div>
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-primary btn-lg">Proceed to Pay</button>

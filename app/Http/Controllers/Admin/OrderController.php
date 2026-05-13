@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Provider;
 use App\Models\Wallet;
 use App\Models\Logged;
 use App\Models\User;
+use App\Services\ProviderService;
 use Illuminate\Http\Request;
 use App\Traits\LogsAdminActivity;
 
@@ -14,286 +16,161 @@ class OrderController extends Controller
 {
     use LogsAdminActivity;
 
-    protected $ogaviralService;
+    protected ProviderService $providerService;
 
-    public function __construct()
+    public function __construct(ProviderService $providerService)
     {
-        $this->ogaviralService = app(\App\Services\OgaviralService::class);
+        $this->providerService = $providerService;
     }
 
-    /**
-     * Display all orders with AUTO STATUS UPDATE
-     */
     public function index(Request $request)
     {
-        $query = Order::with('user');
-        
-        // Search
-        if ($request->has('search') && $request->search) {
+        $query = Order::with(['user', 'provider']);
+
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
                   ->orWhere('service_name', 'like', "%{$search}%")
                   ->orWhere('link', 'like', "%{$search}%")
                   ->orWhere('api_order_id', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%");
-                  });
+                  ->orWhereHas('user', fn($uq) => $uq->where('name', 'like', "%{$search}%")
+                                                      ->orWhere('email', 'like', "%{$search}%"));
             });
         }
-        
-        // Filter by status
-        if ($request->has('status') && $request->status) {
-            $query->where('status', $request->status);
-        }
-        
-        // Filter by date range
-        if ($request->has('date_from') && $request->date_from) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-        if ($request->has('date_to') && $request->date_to) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-        
-        // Filter by amount range
-        if ($request->has('amount_min') && $request->amount_min) {
-            $query->where('charge', '>=', $request->amount_min);
-        }
-        if ($request->has('amount_max') && $request->amount_max) {
-            $query->where('charge', '<=', $request->amount_max);
-        }
-        
-        // Pagination
+
+        if ($request->filled('status'))      $query->where('status', $request->status);
+        if ($request->filled('provider_id')) $query->where('provider_id', $request->provider_id);
+        if ($request->filled('date_from'))   $query->whereDate('created_at', '>=', $request->date_from);
+        if ($request->filled('date_to'))     $query->whereDate('created_at', '<=', $request->date_to);
+        if ($request->filled('amount_min'))  $query->where('charge', '>=', $request->amount_min);
+        if ($request->filled('amount_max'))  $query->where('charge', '<=', $request->amount_max);
+
         $orders = $query->latest()->paginate(20)->withQueryString();
-        
-        // AUTO-UPDATE ORDER STATUSES
+
+        // Auto-update statuses
         $this->autoUpdateOrderStatuses($orders);
-        
-        // Create a base query for statistics with the same filters
+
+        // Stats (same filters)
         $statsQuery = Order::query();
-        
-        // Apply all the same filters to statistics
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $statsQuery->where(function($q) use ($search) {
-                $q->where('id', 'like', "%{$search}%")
-                  ->orWhere('service_name', 'like', "%{$search}%")
-                  ->orWhere('link', 'like', "%{$search}%")
-                  ->orWhere('api_order_id', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%");
-                  });
-            });
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $statsQuery->where(fn($q) => $q->where('id','like',"%$s%")->orWhere('service_name','like',"%$s%")->orWhere('link','like',"%$s%"));
         }
-        
-        if ($request->has('status') && $request->status) {
-            $statsQuery->where('status', $request->status);
-        }
-        
-        if ($request->has('date_from') && $request->date_from) {
-            $statsQuery->whereDate('created_at', '>=', $request->date_from);
-        }
-        
-        if ($request->has('date_to') && $request->date_to) {
-            $statsQuery->whereDate('created_at', '<=', $request->date_to);
-        }
-        
-        if ($request->has('amount_min') && $request->amount_min) {
-            $statsQuery->where('charge', '>=', $request->amount_min);
-        }
-        
-        if ($request->has('amount_max') && $request->amount_max) {
-            $statsQuery->where('charge', '<=', $request->amount_max);
-        }
-        
-        // Statistics based on filtered data
-        $totalOrders = (clone $statsQuery)->count();
-        $pendingOrders = (clone $statsQuery)->where('status', 'pending')->count();
+        if ($request->filled('status'))      $statsQuery->where('status', $request->status);
+        if ($request->filled('provider_id')) $statsQuery->where('provider_id', $request->provider_id);
+        if ($request->filled('date_from'))   $statsQuery->whereDate('created_at', '>=', $request->date_from);
+        if ($request->filled('date_to'))     $statsQuery->whereDate('created_at', '<=', $request->date_to);
+
+        $totalOrders      = (clone $statsQuery)->count();
+        $pendingOrders    = (clone $statsQuery)->where('status', 'pending')->count();
         $processingOrders = (clone $statsQuery)->where('status', 'processing')->count();
-        $completedOrders = (clone $statsQuery)->where('status', 'completed')->count();
-        $cancelledOrders = (clone $statsQuery)->where('status', 'cancelled')->count();
-        $totalRevenue = (clone $statsQuery)->where('status', 'completed')->sum('charge');
-        
-        // Log the view
-        $this->logActivity(
-            'viewed',
-            auth('admin')->user()->name . ' viewed orders list',
-            'Order',
-            null
-        );
-        
+        $completedOrders  = (clone $statsQuery)->where('status', 'completed')->count();
+        $cancelledOrders  = (clone $statsQuery)->where('status', 'cancelled')->count();
+        $totalRevenue     = (clone $statsQuery)->where('status', 'completed')->sum('charge');
+
+        $this->logActivity('viewed', auth('admin')->user()->name . ' viewed orders list', 'Order', null);
+
         return view('admin.orders.index', compact(
-            'orders',
-            'totalOrders',
-            'pendingOrders',
-            'processingOrders',
-            'completedOrders',
-            'cancelledOrders',
-            'totalRevenue'
+            'orders', 'totalOrders', 'pendingOrders', 'processingOrders',
+            'completedOrders', 'cancelledOrders', 'totalRevenue'
         ));
     }
-    /**
-     * Show single order with AUTO STATUS UPDATE
-     */
+
     public function show($id)
     {
-        $order = Order::with('user')->findOrFail($id);
-        
-        // AUTO-UPDATE THIS ORDER'S STATUS
-        $this->autoUpdateSingleOrder($order);
-        
-        // Refresh order data after update
-        $order->refresh();
-        
-        // Get logs related to this order
-        $logs = Logged::where('user_id', $order->user_id)
-            ->where(function($q) use ($order) {
-                $q->where('reference', $order->id)
-                  ->orWhere('description', 'like', "%Order #" . substr($order->id, 0, 8) . "%");
-            })
-            ->latest()
-            ->paginate(10);
+        $order = Order::with(['user', 'provider'])->findOrFail($id);
 
-        // Get customer's wallet balance
-        $latestWallet = Wallet::where('user_id', $order->user_id)
-            ->orderBy('created_at', 'desc')
-            ->first();
+        $this->autoUpdateSingleOrder($order);
+        $order->refresh();
+
+        $logs = Logged::where('user_id', $order->user_id)
+            ->where(fn($q) => $q->where('reference', $order->id)
+                ->orWhere('description', 'like', '%Order #' . substr($order->id, 0, 8) . '%'))
+            ->latest()->paginate(10);
+
+        $latestWallet    = Wallet::where('user_id', $order->user_id)->orderByDesc('created_at')->first();
         $customerBalance = $latestWallet ? $latestWallet->balance_after : 0;
 
-        // Log the view
-        $this->logViewed(
-            'Order',
-            $order->id,
-            auth('admin')->user()->name . ' viewed Order #' . substr($order->id, 0, 8)
-        );
+        $this->logViewed('Order', $order->id, auth('admin')->user()->name . ' viewed Order #' . substr($order->id, 0, 8));
 
         return view('admin.orders.show', compact('order', 'logs', 'customerBalance'));
     }
 
-    /**
-     * Manual status check (triggered by button click)
-     */
     public function checkStatus($id)
     {
-        $order = Order::with('user')->findOrFail($id);
+        $order = Order::with(['user', 'provider'])->findOrFail($id);
 
         if (!$order->api_order_id) {
             return back()->with('error', 'No API order ID found for this order.');
         }
 
         try {
-            $status = $this->ogaviralService->getOrderStatus($order->api_order_id);
+            $status = $this->providerService->getOrderStatus($order->api_order_id, $order->provider_id);
 
             if (isset($status['status'])) {
                 $oldStatus = $order->status;
-                $apiStatus = $status['status'];
-                $newStatus = $this->mapApiStatus($apiStatus);
+                $newStatus = $this->mapApiStatus($status['status']);
 
-                // Check if order should be auto-refunded
                 if ($this->shouldAutoRefund($oldStatus, $newStatus)) {
                     $this->processAutoRefund($order, $oldStatus, $newStatus);
-                    return back()->with('success', 'Order cancelled and refunded automatically. ₦' . number_format($order->charge, 2) . ' has been credited to customer\'s wallet.');
+                    return back()->with('success', 'Order cancelled and refunded. ₦' . number_format($order->charge, 2) . ' credited to wallet.');
                 }
 
-                // Update order
-                $order->update([
-                    'status' => $newStatus,
-                    'api_response' => json_encode($status),
-                ]);
+                $order->update(['status' => $newStatus, 'api_response' => json_encode($status)]);
 
-                // Log in admin logs
-                $this->logUpdated(
-                    'Order',
-                    $order->id,
-                    auth('admin')->user()->name . ' manually checked status for Order #' . substr($order->id, 0, 8) . ' - Updated from ' . $oldStatus . ' to ' . $newStatus,
-                    [
-                        'status' => [
-                            'old' => $oldStatus,
-                            'new' => $newStatus
-                        ],
-                        'api_status' => $apiStatus
-                    ]
+                $this->logUpdated('Order', $order->id,
+                    auth('admin')->user()->name . ' checked status: ' . $oldStatus . ' → ' . $newStatus,
+                    ['status' => ['old' => $oldStatus, 'new' => $newStatus]]
                 );
 
-                // Log in customer logs
                 Logged::create([
-                    'user_id' => $order->user_id,
-                    'reference' => $order->id,
-                    'type' => 'order',
-                    'method' => 'manual_status_check',
-                    'amount' => $order->charge,
-                    'status' => 'success',
-                    'description' => "Order #" . substr($order->id, 0, 8) . " status manually checked by admin: " . auth('admin')->user()->name . " - Status: {$newStatus}",
-                    'ip_address' => request()->ip(),
+                    'user_id'     => $order->user_id,
+                    'reference'   => $order->id,
+                    'type'        => 'order',
+                    'method'      => 'manual_status_check',
+                    'amount'      => $order->charge,
+                    'status'      => 'success',
+                    'description' => "Order #" . substr($order->id, 0, 8) . " manually checked by admin — status: {$newStatus}",
+                    'ip_address'  => request()->ip(),
                 ]);
 
-                return back()->with('success', 'Order status updated successfully: ' . ucfirst($newStatus));
+                return back()->with('success', 'Status updated: ' . ucfirst($newStatus));
             }
 
-            return back()->with('error', 'Failed to fetch order status from API.');
+            return back()->with('error', 'Failed to fetch status from API.');
 
         } catch (\Exception $e) {
-            \Log::error('Manual status check failed for order ' . $order->id . ': ' . $e->getMessage());
-            
-            return back()->with('error', 'Failed to check order status: ' . $e->getMessage());
+            \Log::error('Admin manual status check failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Auto-update order statuses (multiple orders)
-     */
     protected function autoUpdateOrderStatuses($orders)
     {
         foreach ($orders as $order) {
             if (in_array($order->status, ['pending', 'processing']) && $order->api_order_id) {
                 try {
-                    $status = $this->ogaviralService->getOrderStatus($order->api_order_id);
-                    
+                    $status = $this->providerService->getOrderStatus($order->api_order_id, $order->provider_id);
+
                     if (isset($status['status'])) {
-                        $apiStatus = $status['status'];
-                        $newStatus = $this->mapApiStatus($apiStatus);
-                        
+                        $newStatus = $this->mapApiStatus($status['status']);
                         if ($order->status !== $newStatus) {
                             $oldStatus = $order->status;
-                            
-                            // Check if order should be auto-refunded
                             if ($this->shouldAutoRefund($oldStatus, $newStatus)) {
                                 $this->processAutoRefund($order, $oldStatus, $newStatus);
                                 continue;
                             }
-                            
-                            $order->update([
-                                'status' => $newStatus,
-                                'api_response' => json_encode($status),
-                            ]);
-                            
-                            // Log auto-update in admin logs
-                            $this->logActivity(
-                                'auto_status_update',
-                                'System auto-updated Order #' . substr($order->id, 0, 8) . ' from ' . $oldStatus . ' to ' . $newStatus,
-                                'Order',
-                                $order->id,
-                                [
-                                    'status' => [
-                                        'old' => $oldStatus,
-                                        'new' => $newStatus
-                                    ],
-                                    'api_order_id' => $order->api_order_id
-                                ]
-                            );
-
-                            // Log in customer logs
+                            $order->update(['status' => $newStatus, 'api_response' => json_encode($status)]);
                             Logged::create([
-                                'user_id' => $order->user_id,
-                                'reference' => $order->id,
-                                'type' => 'order',
-                                'method' => 'auto_status_update',
-                                'amount' => $order->charge,
-                                'status' => 'completed',
-                                'description' => "Order #" . substr($order->id, 0, 8) . " status auto-updated from {$oldStatus} to {$newStatus}",
-                                'ip_address' => request()->ip(),
+                                'user_id'     => $order->user_id,
+                                'reference'   => $order->id,
+                                'type'        => 'order',
+                                'method'      => 'auto_status_update',
+                                'amount'      => $order->charge,
+                                'status'      => 'completed',
+                                'description' => "Order #" . substr($order->id, 0, 8) . " auto-updated: {$oldStatus} → {$newStatus}",
+                                'ip_address'  => request()->ip(),
                             ]);
                         }
                     }
@@ -304,310 +181,179 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Auto-update single order status
-     */
     protected function autoUpdateSingleOrder($order)
     {
         if (in_array($order->status, ['pending', 'processing']) && $order->api_order_id) {
             try {
-                $status = $this->ogaviralService->getOrderStatus($order->api_order_id);
-                
+                $status = $this->providerService->getOrderStatus($order->api_order_id, $order->provider_id);
                 if (isset($status['status'])) {
-                    $apiStatus = $status['status'];
-                    $newStatus = $this->mapApiStatus($apiStatus);
-                    
+                    $newStatus = $this->mapApiStatus($status['status']);
                     if ($order->status !== $newStatus) {
                         $oldStatus = $order->status;
-                        
-                        // Check if order should be auto-refunded
                         if ($this->shouldAutoRefund($oldStatus, $newStatus)) {
                             $this->processAutoRefund($order, $oldStatus, $newStatus);
                             return;
                         }
-                        
-                        $order->update([
-                            'status' => $newStatus,
-                            'api_response' => json_encode($status),
-                        ]);
-                        
-                        // Log auto-update
-                        $this->logActivity(
-                            'auto_status_update',
-                            'System auto-updated Order #' . substr($order->id, 0, 8) . ' from ' . $oldStatus . ' to ' . $newStatus,
-                            'Order',
-                            $order->id,
-                            [
-                                'status' => [
-                                    'old' => $oldStatus,
-                                    'new' => $newStatus
-                                ]
-                            ]
-                        );
-
-                        // Log in customer logs
-                        Logged::create([
-                            'user_id' => $order->user_id,
-                            'reference' => $order->id,
-                            'type' => 'order',
-                            'method' => 'auto_status_update',
-                            'amount' => $order->charge,
-                            'status' => 'completed',
-                            'description' => "Order #" . substr($order->id, 0, 8) . " status auto-updated from {$oldStatus} to {$newStatus}",
-                            'ip_address' => request()->ip(),
-                        ]);
+                        $order->update(['status' => $newStatus, 'api_response' => json_encode($status)]);
                     }
                 }
             } catch (\Exception $e) {
-                \Log::error('Auto status update failed for order ' . $order->id . ': ' . $e->getMessage());
+                \Log::error('Auto update failed for order ' . $order->id . ': ' . $e->getMessage());
             }
         }
     }
 
-    /**
-     * Check if order should be auto-refunded
-     */
-    protected function shouldAutoRefund($oldStatus, $newStatus)
+    protected function shouldAutoRefund($oldStatus, $newStatus): bool
     {
-        // If old status was pending or processing and new status is cancelled
         return in_array($oldStatus, ['pending', 'processing']) && $newStatus === 'cancelled';
     }
 
-    /**
-     * Process automatic refund
-     */
     protected function processAutoRefund($order, $oldStatus, $newStatus)
     {
         try {
-            // Get user's current balance
-            $user = $order->user;
-            $latestWallet = Wallet::where('user_id', $order->user_id)
-                ->orderBy('created_at', 'desc')
-                ->first();
-            $currentBalance = $latestWallet ? $latestWallet->balance_after : 0;
+            $user         = $order->user;
+            $latestWallet = Wallet::where('user_id', $order->user_id)->orderByDesc('created_at')->first();
+            $balance      = $latestWallet ? $latestWallet->balance_after : 0;
 
-            // Create refund wallet transaction
             $wallet = Wallet::create([
-                'user_id' => $order->user_id,
-                'balance_before' => $currentBalance,
-                'amount' => $order->charge,
-                'balance_after' => $currentBalance + $order->charge,
-                'type' => 'credit',
-                'description' => "Auto-refund for Order #" . substr($order->id, 0, 8) . " - Order cancelled by provider (Ref: {$order->id})",
-                'reference' => 'REFUND-' . strtoupper(uniqid()),
+                'user_id'        => $order->user_id,
+                'balance_before' => $balance,
+                'amount'         => $order->charge,
+                'balance_after'  => $balance + $order->charge,
+                'type'           => 'credit',
+                'description'    => "Auto-refund for Order #" . substr($order->id, 0, 8) . " — cancelled by provider",
+                'reference'      => 'REFUND-' . strtoupper(uniqid()),
                 'payment_method' => 'refund',
-                'status' => 'success',
+                'status'         => 'success',
             ]);
 
-            // Update user balance
             $user->increment('balance', $order->charge);
-
-            // Update order status
             $order->update(['status' => 'cancelled']);
 
-            // Log the auto-refund in admin logs
-            $this->logActivity(
-                'auto_refunded',
-                'System auto-refunded Order #' . substr($order->id, 0, 8) . ' - ₦' . number_format($order->charge, 2) . ' refunded to ' . $order->user->name . ' (Status changed from ' . $oldStatus . ' to cancelled)',
-                'Order',
-                $order->id,
-                [
-                    'refund_amount' => $order->charge,
-                    'order_status_changed' => [
-                        'old' => $oldStatus,
-                        'new' => 'cancelled'
-                    ],
-                    'refund_type' => 'automatic'
-                ]
+            $this->logActivity('auto_refunded',
+                'Auto-refund: Order #' . substr($order->id, 0, 8) . ' — ₦' . number_format($order->charge, 2) . ' → ' . $user->name,
+                'Order', $order->id, ['refund_amount' => $order->charge, 'old_status' => $oldStatus]
             );
 
-            // Log in customer's activity log
             Logged::create([
-                'user_id' => $order->user_id,
-                'reference' => $wallet->reference,
-                'type' => 'wallet',
-                'method' => 'auto_refund',
-                'amount' => $order->charge,
-                'status' => 'success',
-                'description' => "Auto-refund processed for Order #" . substr($order->id, 0, 8) . " - Order was cancelled by provider",
-                'ip_address' => request()->ip(),
+                'user_id'     => $order->user_id,
+                'reference'   => $wallet->reference,
+                'type'        => 'wallet',
+                'method'      => 'auto_refund',
+                'amount'      => $order->charge,
+                'status'      => 'success',
+                'description' => "Auto-refund for Order #" . substr($order->id, 0, 8) . " — provider cancelled",
+                'ip_address'  => request()->ip(),
             ]);
-
-            \Log::info('Auto-refund processed for order ' . $order->id . ' - Amount: ₦' . number_format($order->charge, 2));
 
         } catch (\Exception $e) {
             \Log::error('Auto-refund failed for order ' . $order->id . ': ' . $e->getMessage());
         }
     }
 
-    /**
-     * Map API status to database status
-     */
-    protected function mapApiStatus($apiStatus)
+    protected function mapApiStatus($apiStatus): string
     {
-        $statusMap = [
-            'Pending' => 'pending',
+        return [
+            'Pending'     => 'pending',
             'In progress' => 'processing',
-            'Processing' => 'processing',
-            'Completed' => 'completed',
-            'Partial' => 'completed', // Map partial to completed
-            'Cancelled' => 'cancelled',
-            'Canceled' => 'cancelled',
-        ];
-        
-        return $statusMap[$apiStatus] ?? strtolower($apiStatus);
+            'Processing'  => 'processing',
+            'Completed'   => 'completed',
+            'Partial'     => 'partial',
+            'Cancelled'   => 'cancelled',
+            'Canceled'    => 'cancelled',
+        ][$apiStatus] ?? strtolower($apiStatus);
     }
 
-    /**
-     * Update order status (Super Admin & Accountant only)
-     */
     public function updateStatus(Request $request, $id)
     {
-        if (!auth('admin')->user()->canEditOrders()) {
-            abort(403, 'Unauthorized action.');
-        }
+        if (!auth('admin')->user()->canEditOrders()) abort(403);
 
-        $order = Order::with('user')->findOrFail($id);
-
-        $request->validate([
-            'status' => 'required|in:pending,processing,completed,cancelled,refunded',
-        ]);
-
+        $order     = Order::with('user')->findOrFail($id);
         $oldStatus = $order->status;
+
+        $request->validate(['status' => 'required|in:pending,processing,completed,cancelled,refunded']);
         $order->update(['status' => $request->status]);
 
-        // Log the status change in admin logs
-        $this->logUpdated(
-            'Order',
-            $order->id,
-            auth('admin')->user()->name . ' updated Order #' . substr($order->id, 0, 8) . ' status from ' . $oldStatus . ' to ' . $request->status,
-            [
-                'status' => [
-                    'old' => $oldStatus,
-                    'new' => $request->status
-                ]
-            ]
+        $this->logUpdated('Order', $order->id,
+            auth('admin')->user()->name . ' updated Order #' . substr($order->id, 0, 8) . ": {$oldStatus} → {$request->status}",
+            ['status' => ['old' => $oldStatus, 'new' => $request->status]]
         );
 
-        // Log in customer's activity log
         Logged::create([
-            'user_id' => $order->user_id,
-            'reference' => $order->id,
-            'type' => 'order',
-            'method' => 'status_update',
-            'amount' => $order->charge,
-            'status' => 'success',
-            'description' => "Order #" . substr($order->id, 0, 8) . " status changed from {$oldStatus} to {$request->status} by admin: " . auth('admin')->user()->name,
-            'ip_address' => $request->ip(),
+            'user_id'     => $order->user_id,
+            'reference'   => $order->id,
+            'type'        => 'order',
+            'method'      => 'status_update',
+            'amount'      => $order->charge,
+            'status'      => 'success',
+            'description' => "Order #" . substr($order->id, 0, 8) . " status: {$oldStatus} → {$request->status} by admin",
+            'ip_address'  => $request->ip(),
         ]);
 
-        return back()->with('success', 'Order status updated successfully');
+        return back()->with('success', 'Order status updated.');
     }
 
-    /**
-     * Refund order (Super Admin & Accountant only)
-     */
     public function refund(Request $request, $id)
     {
-        if (!auth('admin')->user()->canEditOrders()) {
-            abort(403, 'Unauthorized action.');
-        }
+        if (!auth('admin')->user()->canEditOrders()) abort(403);
 
         $order = Order::with('user')->findOrFail($id);
+        if ($order->status === 'completed') return back()->with('error', 'Cannot refund completed orders.');
 
-        if ($order->status === 'completed') {
-            return back()->with('error', 'Cannot refund completed orders.');
-        }
+        $user         = $order->user;
+        $latestWallet = Wallet::where('user_id', $order->user_id)->orderByDesc('created_at')->first();
+        $balance      = $latestWallet ? $latestWallet->balance_after : 0;
 
-        // Get user's current balance
-        $user = $order->user;
-        $latestWallet = Wallet::where('user_id', $order->user_id)
-            ->orderBy('created_at', 'desc')
-            ->first();
-        $currentBalance = $latestWallet ? $latestWallet->balance_after : 0;
-
-        // Refund to wallet
         $wallet = Wallet::create([
-            'user_id' => $order->user_id,
-            'balance_before' => $currentBalance,
-            'amount' => $order->charge,
-            'balance_after' => $currentBalance + $order->charge,
-            'type' => 'credit',
-            'description' => "Refund for Order #" . substr($order->id, 0, 8) . " - " . $order->service_name,
-            'reference' => 'REFUND-' . $order->id,
+            'user_id'        => $order->user_id,
+            'balance_before' => $balance,
+            'amount'         => $order->charge,
+            'balance_after'  => $balance + $order->charge,
+            'type'           => 'credit',
+            'description'    => "Refund for Order #" . substr($order->id, 0, 8),
+            'reference'      => 'REFUND-' . $order->id,
             'payment_method' => 'refund',
-            'status' => 'success',
+            'status'         => 'success',
         ]);
 
-        // Update user balance
         $user->increment('balance', $order->charge);
-
-        // Update order status
         $oldStatus = $order->status;
         $order->update(['status' => 'cancelled']);
 
-        // Log the refund in admin logs
-        $this->logActivity(
-            'refunded',
-            auth('admin')->user()->name . ' refunded Order #' . substr($order->id, 0, 8) . ' - ₦' . number_format($order->charge, 2) . ' refunded to ' . $order->user->name,
-            'Order',
-            $order->id,
-            [
-                'refund_amount' => $order->charge,
-                'order_status_changed' => [
-                    'old' => $oldStatus,
-                    'new' => 'cancelled'
-                ]
-            ]
+        $this->logActivity('refunded',
+            auth('admin')->user()->name . ' refunded Order #' . substr($order->id, 0, 8) . ' — ₦' . number_format($order->charge, 2),
+            'Order', $order->id
         );
 
-        // Log in customer's activity log
         Logged::create([
-            'user_id' => $order->user_id,
-            'reference' => $wallet->reference,
-            'type' => 'wallet',
-            'method' => 'refund',
-            'amount' => $order->charge,
-            'status' => 'success',
-            'description' => "Refund processed for Order #" . substr($order->id, 0, 8) . " by admin: " . auth('admin')->user()->name,
-            'ip_address' => $request->ip(),
+            'user_id'     => $order->user_id,
+            'reference'   => $wallet->reference,
+            'type'        => 'wallet',
+            'method'      => 'refund',
+            'amount'      => $order->charge,
+            'status'      => 'success',
+            'description' => "Refund for Order #" . substr($order->id, 0, 8) . " by admin",
+            'ip_address'  => $request->ip(),
         ]);
 
-        return back()->with('success', 'Order refunded successfully. ₦' . number_format($order->charge, 2) . ' has been credited to customer\'s wallet.');
+        return back()->with('success', '₦' . number_format($order->charge, 2) . ' refunded to wallet.');
     }
 
-    /**
-     * Delete order (Super Admin & Accountant only)
-     */
     public function destroy($id)
     {
-        if (!auth('admin')->user()->canDeleteOrders()) {
-            abort(403, 'Unauthorized action.');
-        }
+        if (!auth('admin')->user()->canDeleteOrders()) abort(403);
 
         $order = Order::with('user')->findOrFail($id);
-
         if (in_array($order->status, ['pending', 'processing'])) {
-            return back()->with('error', 'Cannot delete active orders. Please cancel or complete the order first.');
+            return back()->with('error', 'Cannot delete active orders.');
         }
 
-        $orderData = [
-            'id' => $order->id,
-            'service_name' => $order->service_name,
-            'charge' => $order->charge,
-            'user_name' => $order->user->name,
-        ];
-
-        // Log the deletion
-        $this->logDeleted(
-            'Order',
-            $order->id,
-            auth('admin')->user()->name . ' deleted Order #' . substr($order->id, 0, 8) . ' for ' . $order->user->name
+        $this->logDeleted('Order', $order->id,
+            auth('admin')->user()->name . ' deleted Order #' . substr($order->id, 0, 8)
         );
 
         $order->delete();
 
-        return redirect()->route('admin.orders.index')
-            ->with('success', 'Order deleted successfully');
+        return redirect()->route('admin.orders.index')->with('success', 'Order deleted.');
     }
 }
