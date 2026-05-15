@@ -1,4 +1,5 @@
 User-agent: *
+allow: /*
 Disallow: /admin/
 
-Sitemap: https://boosterr.xyz/sitemap.xml
+Sitemap: https://virextra.com/sitemap.xml
